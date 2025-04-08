@@ -9,6 +9,7 @@ void ui_Main_Screen_screen_init(void)
 {
     ui_Main_Screen = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_Main_Screen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_Main_Screen, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_TopInfoBar1 = lv_obj_create(ui_Main_Screen);
     lv_obj_remove_style_all(ui_TopInfoBar1);
@@ -67,26 +68,26 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_add_flag(ui_imInternetNOK4, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_imInternetNOK4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_TabView1 = lv_tabview_create(ui_Main_Screen);
-    lv_tabview_set_tab_bar_size(ui_TabView1, 30);
-    lv_obj_set_width(ui_TabView1, 318);
-    lv_obj_set_height(ui_TabView1, 217);
-    lv_obj_set_x(ui_TabView1, 0);
-    lv_obj_set_y(ui_TabView1, 22);
-    lv_obj_set_align(ui_TabView1, LV_ALIGN_TOP_MID);
-    lv_obj_remove_flag(ui_TabView1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_border_color(ui_TabView1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_TabView1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_TabView1, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_MainTabView = lv_tabview_create(ui_Main_Screen);
+    lv_tabview_set_tab_bar_size(ui_MainTabView, 30);
+    lv_obj_set_width(ui_MainTabView, 318);
+    lv_obj_set_height(ui_MainTabView, 217);
+    lv_obj_set_x(ui_MainTabView, 0);
+    lv_obj_set_y(ui_MainTabView, 22);
+    lv_obj_set_align(ui_MainTabView, LV_ALIGN_TOP_MID);
+    lv_obj_remove_flag(ui_MainTabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_MainTabView, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_MainTabView, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_MainTabView, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_border_color(lv_tabview_get_tab_bar(ui_TabView1), lv_color_hex(0x000000),
+    lv_obj_set_style_border_color(lv_tabview_get_tab_bar(ui_MainTabView), lv_color_hex(0x000000),
                                   LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(lv_tabview_get_tab_bar(ui_TabView1), 255,  LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(lv_tabview_get_tab_bar(ui_TabView1), 1,  LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(lv_tabview_get_tab_bar(ui_TabView1), LV_BORDER_SIDE_BOTTOM,
+    lv_obj_set_style_border_opa(lv_tabview_get_tab_bar(ui_MainTabView), 255,  LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(lv_tabview_get_tab_bar(ui_MainTabView), 1,  LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_side(lv_tabview_get_tab_bar(ui_MainTabView), LV_BORDER_SIDE_BOTTOM,
                                  LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Main = lv_tabview_add_tab(ui_TabView1, "Main");
+    ui_Main = lv_tabview_add_tab(ui_MainTabView, "Main");
     lv_obj_remove_flag(ui_Main, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_pad_left(ui_Main, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_Main, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -247,7 +248,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_align(ui_lblH, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lblH, "[h]");
 
-    ui_Statistic = lv_tabview_add_tab(ui_TabView1, "Statistic");
+    ui_Statistic = lv_tabview_add_tab(ui_MainTabView, "Statistic");
 
     ui_Arc2 = lv_arc_create(ui_Statistic);
     lv_obj_set_width(ui_Arc2, 150);
@@ -258,11 +259,11 @@ void ui_Main_Screen_screen_init(void)
     lv_arc_set_value(ui_Arc2, 50);
 
 
-    ui_Param = lv_tabview_add_tab(ui_TabView1, "Param");
+    ui_Param = lv_tabview_add_tab(ui_MainTabView, "Param");
 
-    ui_Settings = lv_tabview_add_tab(ui_TabView1, "Settings");
+    ui_Settings = lv_tabview_add_tab(ui_MainTabView, "Settings");
 
-    ui_About = lv_tabview_add_tab(ui_TabView1, "About");
+    ui_About = lv_tabview_add_tab(ui_MainTabView, "About");
     lv_obj_set_flex_flow(ui_About, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_About, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_left(ui_About, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -283,7 +284,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_border_width(ui_ConBuildDate, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui_ConBuildDate, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_ConBuildDate, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ConBuildDate, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ConBuildDate, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_ConBuildDate, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_ConBuildDate, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -296,7 +297,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_width(ui_lblBuildDateValue, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblBuildDateValue, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_lblBuildDateValue, LV_ALIGN_RIGHT_MID);
-    lv_label_set_text(ui_lblBuildDateValue, "Oct 23 2024 12:22:36");
+    lv_label_set_text(ui_lblBuildDateValue, "Oct 99 2099 12:22:36");
 
     ui_ConBuildVersion = lv_obj_create(ui_About);
     lv_obj_remove_style_all(ui_ConBuildVersion);
@@ -309,7 +310,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_border_width(ui_ConBuildVersion, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui_ConBuildVersion, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_ConBuildVersion, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ConBuildVersion, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ConBuildVersion, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_ConBuildVersion, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_ConBuildVersion, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -342,13 +343,15 @@ void ui_Main_Screen_screen_init(void)
     ui_lblRunTime = lv_label_create(ui_ConRunTime);
     lv_obj_set_width(ui_lblRunTime, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblRunTime, LV_SIZE_CONTENT);    /// 1
-    lv_label_set_text(ui_lblRunTime, "RunTime (year-day h:m:s)");
+    lv_label_set_text(ui_lblRunTime, "RunTime (y-d h:m:s):");
 
     ui_lblRunTimeValue = lv_label_create(ui_ConRunTime);
-    lv_obj_set_width(ui_lblRunTimeValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_lblRunTimeValue, lv_pct(45));
     lv_obj_set_height(ui_lblRunTimeValue, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_lblRunTimeValue, LV_ALIGN_RIGHT_MID);
-    lv_label_set_text(ui_lblRunTimeValue, "10-365 24:59:55.5");
+    lv_label_set_text(ui_lblRunTimeValue, "99-999 99:99:99.9");
+    lv_obj_set_style_text_align(ui_lblRunTimeValue, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_lblRunTimeValue, &ui_font_DejaVuSansMono14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ConGitHub = lv_obj_create(ui_About);
     lv_obj_remove_style_all(ui_ConGitHub);
@@ -361,7 +364,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_border_width(ui_ConGitHub, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui_ConGitHub, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_ConGitHub, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ConGitHub, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ConGitHub, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_ConGitHub, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_ConGitHub, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -389,7 +392,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_border_width(ui_ConAuth, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui_ConAuth, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_ConAuth, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ConAuth, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ConAuth, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_ConAuth, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_ConAuth, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -403,7 +406,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_width(ui_lblGitHub1, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblGitHub1, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_lblGitHub1, LV_ALIGN_RIGHT_MID);
-    lv_label_set_text(ui_lblGitHub1, "Kis Laszlo Daniel\nkislac66@gmail.com");
+    lv_label_set_text(ui_lblGitHub1, "Kis László Dániel\nkislac66@gmail.com");
     lv_obj_set_style_text_align(ui_lblGitHub1, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_lblGitHub1, &ui_font_MontserratRegular14ExtASCIMedium, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 }

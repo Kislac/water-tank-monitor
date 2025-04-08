@@ -24,7 +24,7 @@ extern lv_obj_t * ui_imWifiConnected4;
 extern lv_obj_t * ui_imWifiDisconnected4;
 extern lv_obj_t * ui_imInternetOK4;
 extern lv_obj_t * ui_imInternetNOK4;
-extern lv_obj_t * ui_TabView1;
+extern lv_obj_t * ui_MainTabView;
 extern lv_obj_t * ui_Main;
 extern lv_obj_t * ui_Bar1;
 extern lv_obj_t * ui_lblMaxValue;
@@ -170,6 +170,10 @@ LV_IMG_DECLARE(ui_img_478874422);    // assets/communicator-off-disabled-light.p
 
 
 
+LV_FONT_DECLARE(ui_font_DejaVuSansMono14);
+LV_FONT_DECLARE(ui_font_MontserratRegular14ExtASCI);
+LV_FONT_DECLARE(ui_font_MontserratRegular14ExtASCIBold);
+LV_FONT_DECLARE(ui_font_MontserratRegular14ExtASCIMedium);
 
 
 

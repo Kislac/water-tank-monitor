@@ -18,7 +18,7 @@ lv_obj_t * ui_imWifiConnected4;
 lv_obj_t * ui_imWifiDisconnected4;
 lv_obj_t * ui_imInternetOK4;
 lv_obj_t * ui_imInternetNOK4;
-lv_obj_t * ui_TabView1;
+lv_obj_t * ui_MainTabView;
 lv_obj_t * ui_Main;
 lv_obj_t * ui_Bar1;
 lv_obj_t * ui_lblMaxValue;

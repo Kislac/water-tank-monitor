@@ -1,8 +1,87 @@
 {
   "deftheme": {
     "name": "Default",
-    "properties": []
+    "properties": [
+      {
+        "nid": -1394251318,
+        "strtype": "THEME_COLOR",
+        "strval": "BackGround",
+        "intarray": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "InheritedType": 0
+      },
+      {
+        "nid": -1530890995,
+        "strtype": "THEME_COLOR",
+        "strval": "FontColor",
+        "intarray": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "InheritedType": 0
+      },
+      {
+        "nid": -1147166688,
+        "strtype": "THEME_COLOR",
+        "strval": "Border",
+        "intarray": [
+          44,
+          44,
+          44,
+          255
+        ],
+        "InheritedType": 0
+      }
+    ]
   },
-  "themes": [],
-  "selected_theme": "Default"
+  "themes": [
+    {
+      "name": "Dark Mode",
+      "properties": [
+        {
+          "nid": -1394251318,
+          "strtype": "THEME_COLOR",
+          "strval": "BackGround",
+          "intarray": [
+            55,
+            55,
+            55,
+            255
+          ],
+          "InheritedType": 0
+        },
+        {
+          "nid": -1530890995,
+          "strtype": "THEME_COLOR",
+          "strval": "FontColor",
+          "intarray": [
+            255,
+            255,
+            255,
+            255
+          ],
+          "InheritedType": 0
+        },
+        {
+          "nid": -1147166688,
+          "strtype": "THEME_COLOR",
+          "strval": "Border",
+          "intarray": [
+            177,
+            177,
+            177,
+            255
+          ],
+          "InheritedType": 0
+        }
+      ]
+    }
+  ],
+  "selected_theme": "Dark Mode"
 }

@@ -46,6 +46,30 @@ void initializeBuildInfo()
   lv_label_set_text(ui_lblBuildVersionValue, version);
 }
 
+
+lv_obj_t * wifiDisconnectedImages[4];
+lv_obj_t * wifiConnectedImages[4];
+lv_obj_t * internetOKImages[4];
+lv_obj_t * internetNOKImages[4];
+void initWifiSignalImages(){
+  wifiDisconnectedImages[0] = ui_imWifiDisconnected1;
+  wifiDisconnectedImages[1] = ui_imWifiDisconnected2;
+  wifiDisconnectedImages[2] = ui_imWifiDisconnected3;
+  wifiDisconnectedImages[3] = ui_imWifiDisconnected4;
+  wifiConnectedImages[0] = ui_imWifiConnected1;
+  wifiConnectedImages[1] = ui_imWifiConnected2;
+  wifiConnectedImages[2] = ui_imWifiConnected3;
+  wifiConnectedImages[3] = ui_imWifiConnected4;
+  internetOKImages[0] = ui_imInternetOK1;
+  internetOKImages[1] = ui_imInternetOK2;
+  internetOKImages[2] = ui_imInternetOK3;
+  internetOKImages[3] = ui_imInternetOK4;
+  internetNOKImages[0] = ui_imInternetNOK1;
+  internetNOKImages[1] = ui_imInternetNOK2;
+  internetNOKImages[2] = ui_imInternetNOK3;
+  internetNOKImages[3] = ui_imInternetNOK4;
+}
+
 void funcWifiScan(lv_event_t * e){
   Serial.println("funcWifiScan");
   Serial.println("Starting WiFi scan...");
@@ -219,10 +243,7 @@ void RetryButtonWrongPassword(lv_event_t * e){
 }
 
 
-lv_obj_t * wifiDisconnectedImages[3];
-lv_obj_t * wifiConnectedImages[3];
-lv_obj_t * internetOKImages[3];
-lv_obj_t * internetNOKImages[3];
+
 
 
 // Függvény a képek láthatóságának frissítésére
@@ -346,7 +367,31 @@ void funcResetWifi(lv_event_t * e){
 }
 
 
+void runtimecalc(){
+  static ulong last_runtime = 0;
 
+  if (millis() - last_runtime >= 100) { // Refresh every 100ms
+    last_runtime = millis();
+
+    int64_t total_seconds = now / 1000;
+    int years = total_seconds / (365 * 24 * 3600);
+    total_seconds %= (365 * 24 * 3600);
+    int days = total_seconds / (24 * 3600);
+    total_seconds %= (24 * 3600);
+    int hours = total_seconds / 3600;
+    total_seconds %= 3600;
+    int minutes = total_seconds / 60;
+    float seconds = total_seconds % 60 + (now % 1000) / 1000.0;
+
+    if (lv_tabview_get_tab_act(ui_MainTabView) == 4) {
+        // Update the audio tab
+        sprintf(text_buffer, "%02d-%03d %02d:%02d:%02.1f", years, days, hours, minutes, seconds);
+        lv_label_set_text(ui_lblRunTimeValue, text_buffer);
+        //sprintf(text_buffer, "%02d hour %02d min %02.1f sec", hours, minutes, seconds);
+        //lv_label_set_text(ui_lblRuntimeHMSValue, text_buffer);
+    }
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -368,24 +413,18 @@ void setup() {
 
 
 // Init the Wifi Signal images. Important to init after ui_init()
-wifiDisconnectedImages[0] = ui_imWifiDisconnected1;
-wifiDisconnectedImages[1] = ui_imWifiDisconnected2;
-wifiDisconnectedImages[2] = ui_imWifiDisconnected3;
-wifiConnectedImages[0] = ui_imWifiConnected1;
-wifiConnectedImages[1] = ui_imWifiConnected2;
-wifiConnectedImages[2] = ui_imWifiConnected3;
-internetOKImages[0] = ui_imInternetOK1;
-internetOKImages[1] = ui_imInternetOK2;
-internetOKImages[2] = ui_imInternetOK3;
-internetNOKImages[0] = ui_imInternetNOK1;
-internetNOKImages[1] = ui_imInternetNOK2;
-internetNOKImages[2] = ui_imInternetNOK3;
+initWifiSignalImages();
+
+
+initializeBuildInfo();
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
+    runtimecalc();
+    //AutoBacklight();
     RefreshWifiParameters();
     refreshStatus();
       // Update the ticker

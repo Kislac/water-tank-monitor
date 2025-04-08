@@ -1748,12 +1748,27 @@
                     "strval": "DEFAULT",
                     "childs": [
                       {
+                        "nid": 750706937,
+                        "strtype": "_style/Bg_Color",
+                        "strval": "BackGround",
+                        "integer": -1394251318,
+                        "intarray": [
+                          55,
+                          55,
+                          55,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
                         "nid": -1286630219,
                         "strtype": "_style/Border_Color",
+                        "strval": "Border",
+                        "integer": -1147166688,
                         "intarray": [
-                          0,
-                          0,
-                          0,
+                          177,
+                          177,
+                          177,
                           255
                         ],
                         "InheritedType": 7
@@ -7062,7 +7077,7 @@
                           {
                             "nid": 1501351702,
                             "strtype": "LABEL/Text",
-                            "strval": "Oct 23 2024 12:22:36",
+                            "strval": "Oct 99 2099 12:22:36",
                             "InheritedType": 10
                           },
                           {
@@ -7368,7 +7383,7 @@
                                 "strtype": "_style/Padding",
                                 "intarray": [
                                   5,
-                                  5,
+                                  8,
                                   3,
                                   3
                                 ],
@@ -8262,7 +8277,7 @@
                                 "strtype": "_style/Padding",
                                 "intarray": [
                                   5,
-                                  5,
+                                  8,
                                   3,
                                   3
                                 ],
@@ -8564,7 +8579,7 @@
                           {
                             "nid": -564188830,
                             "strtype": "LABEL/Text",
-                            "strval": "RunTime (year-day h:m:s)",
+                            "strval": "RunTime (y-d h:m:s):",
                             "InheritedType": 10
                           },
                           {
@@ -8624,10 +8639,10 @@
                           },
                           {
                             "nid": 1258836015,
-                            "flags": 51,
+                            "flags": 50,
                             "strtype": "OBJECT/Size",
                             "intarray": [
-                              1,
+                              46,
                               1
                             ],
                             "InheritedType": 7
@@ -8850,12 +8865,33 @@
                           {
                             "nid": -1119855561,
                             "strtype": "LABEL/Text",
-                            "strval": "10-365 24:59:55.5",
+                            "strval": "99-999 99:99:99.9",
                             "InheritedType": 10
                           },
                           {
                             "part": "lv.PART.MAIN",
-                            "childs": [],
+                            "childs": [
+                              {
+                                "nid": 392934727,
+                                "strtype": "_style/StyleState",
+                                "strval": "DEFAULT",
+                                "childs": [
+                                  {
+                                    "nid": -301799412,
+                                    "strtype": "_style/Text_Align",
+                                    "strval": "LEFT",
+                                    "InheritedType": 3
+                                  },
+                                  {
+                                    "nid": 572124497,
+                                    "strtype": "_style/Text_Font",
+                                    "strval": "DejaVuSansMono14",
+                                    "InheritedType": 3
+                                  }
+                                ],
+                                "InheritedType": 1
+                              }
+                            ],
                             "nid": -1560773253,
                             "strtype": "LABEL/Style_main",
                             "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
@@ -9156,7 +9192,7 @@
                                 "strtype": "_style/Padding",
                                 "intarray": [
                                   5,
-                                  5,
+                                  7,
                                   3,
                                   3
                                 ],
@@ -10065,7 +10101,7 @@
                                 "strtype": "_style/Padding",
                                 "intarray": [
                                   5,
-                                  5,
+                                  8,
                                   3,
                                   3
                                 ],
@@ -10653,7 +10689,7 @@
                           {
                             "nid": -181951036,
                             "strtype": "LABEL/Text",
-                            "strval": "Kis Laszlo Daniel\\nkislac66@gmail.com",
+                            "strval": "Kis László Dániel\\nkislac66@gmail.com",
                             "InheritedType": 10
                           },
                           {
@@ -10668,6 +10704,12 @@
                                     "nid": -644922708,
                                     "strtype": "_style/Text_Align",
                                     "strval": "RIGHT",
+                                    "InheritedType": 3
+                                  },
+                                  {
+                                    "nid": -958288676,
+                                    "strtype": "_style/Text_Font",
+                                    "strval": "MontserratRegular14ExtASCIMedium",
                                     "InheritedType": 3
                                   }
                                 ],
@@ -10974,7 +11016,7 @@
                                 "strtype": "_style/Padding",
                                 "intarray": [
                                   5,
-                                  5,
+                                  8,
                                   3,
                                   3
                                 ],
@@ -11284,7 +11326,7 @@
               {
                 "nid": 1569376317,
                 "strtype": "OBJECT/Name",
-                "strval": "TabView1",
+                "strval": "MainTabView",
                 "InheritedType": 10
               },
               {
@@ -11570,12 +11612,27 @@
                     "strval": "DEFAULT",
                     "childs": [
                       {
+                        "nid": 972631080,
+                        "strtype": "_style/Bg_Color",
+                        "strval": "BackGround",
+                        "integer": -1394251318,
+                        "intarray": [
+                          55,
+                          55,
+                          55,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
                         "nid": 842608479,
                         "strtype": "_style/Border_Color",
+                        "strval": "Border",
+                        "integer": -1147166688,
                         "intarray": [
-                          0,
-                          0,
-                          0,
+                          177,
+                          177,
+                          177,
                           255
                         ],
                         "InheritedType": 7
@@ -11850,7 +11907,22 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": -2042185377,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": -1295186860,
+                    "strtype": "_style/Text_Font",
+                    "strval": "montserrat_14",
+                    "InheritedType": 3
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": 41545469,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -37405,7 +37477,7 @@
     "saved_objtypeKey": "STARTEVENTS"
   },
   "animations": [],
-  "selected_theme": "Default",
+  "selected_theme": "Dark Mode",
   "info": {
     "name": "ESP_CYD_Playground.spj",
     "depth": 1,
@@ -37429,9 +37501,9 @@
     "theme_dark": false,
     "theme_color1": 5,
     "theme_color2": 0,
-    "uiExportFolderPath": "D:\\GIT\\water-tank-monitor\\src\\ui",
-    "projectExportFolderPath": "D:\\GIT\\water-tank-monitor",
-    "backup_cnt": 133,
+    "uiExportFolderPath": "C:\\04_Offwork\\Github\\water-tank-monitor\\src\\ui",
+    "projectExportFolderPath": "C:\\04_Offwork\\Github\\water-tank-monitor",
+    "backup_cnt": 193,
     "autosave_cnt": 0,
     "lvgl_version": "9.1.0",
     "callfuncsexport": "DONT_EXPORT",

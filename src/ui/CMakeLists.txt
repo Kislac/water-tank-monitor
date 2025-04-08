@@ -8,6 +8,10 @@ SET(SOURCES screens/ui_Main_Screen.c
     images/ui_img_1628538605.c
     images/ui_img_1718934963.c
     images/ui_img_communicator_png.c
-    images/ui_img_478874422.c)
+    images/ui_img_478874422.c
+    fonts/ui_font_DejaVuSansMono14.c
+    fonts/ui_font_MontserratRegular14ExtASCI.c
+    fonts/ui_font_MontserratRegular14ExtASCIBold.c
+    fonts/ui_font_MontserratRegular14ExtASCIMedium.c)
 
 add_library(ui ${SOURCES})
