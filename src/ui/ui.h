@@ -14,6 +14,8 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
+#include "ui_theme_manager.h"
+#include "ui_themes.h"
 
 // SCREEN: ui_Main_Screen
 void ui_Main_Screen_screen_init(void);
@@ -44,6 +46,35 @@ extern lv_obj_t * ui_Statistic;
 extern lv_obj_t * ui_Arc2;
 extern lv_obj_t * ui_Param;
 extern lv_obj_t * ui_Settings;
+extern lv_obj_t * ui_Container2;
+extern lv_obj_t * ui_lblWifiSwitch;
+void ui_event_btnWifi(lv_event_t * e);
+extern lv_obj_t * ui_btnWifi;
+extern lv_obj_t * ui_Label5;
+void ui_event_btnMQTT(lv_event_t * e);
+extern lv_obj_t * ui_btnMQTT;
+extern lv_obj_t * ui_Label30;
+extern lv_obj_t * ui_ContDarkMode;
+extern lv_obj_t * ui_lblDarkMode;
+void ui_event_Switch2(lv_event_t * e);
+extern lv_obj_t * ui_Switch2;
+extern lv_obj_t * ui_ContBackLigth;
+extern lv_obj_t * ui_lblBackLight;
+void ui_event_switchManualAutomatic(lv_event_t * e);
+extern lv_obj_t * ui_switchManualAutomatic;
+extern lv_obj_t * ui_Label6;
+extern lv_obj_t * ui_lblLigthSensorValue;
+void ui_event_LigthSensorSlider(lv_event_t * e);
+extern lv_obj_t * ui_LigthSensorSlider;
+extern lv_obj_t * ui_lblLigthSensorSliderValue;
+extern lv_obj_t * ui_ContLanguage;
+extern lv_obj_t * ui_lblLanguage;
+extern lv_obj_t * ui_DropdownLanguage;
+extern lv_obj_t * ui_ContRotateScreen;
+extern lv_obj_t * ui_lblrotate;
+void ui_event_btnRotate(lv_event_t * e);
+extern lv_obj_t * ui_btnRotate;
+extern lv_obj_t * ui_Label7;
 extern lv_obj_t * ui_About;
 extern lv_obj_t * ui_ConBuildDate;
 extern lv_obj_t * ui_lblBuildDate;
@@ -69,8 +100,6 @@ extern lv_obj_t * ui_imWifiConnected2;
 extern lv_obj_t * ui_imWifiDisconnected2;
 extern lv_obj_t * ui_imInternetOK2;
 extern lv_obj_t * ui_imInternetNOK2;
-extern lv_obj_t * ui_lblTime1;
-extern lv_obj_t * ui_Label28;
 extern lv_obj_t * ui_Container3;
 extern lv_obj_t * ui_Container9;
 extern lv_obj_t * ui_Label4;
@@ -94,14 +123,17 @@ extern lv_obj_t * ui_Container16;
 extern lv_obj_t * ui_Label27;
 extern lv_obj_t * ui_lblTime;
 extern lv_obj_t * ui_lblTimeZone;
-void ui_event_Button3(lv_event_t * e);
-extern lv_obj_t * ui_Button3;
+void ui_event_btnScanWifi(lv_event_t * e);
+extern lv_obj_t * ui_btnScanWifi;
 extern lv_obj_t * ui_Label11;
 extern lv_obj_t * ui_Container15;
 extern lv_obj_t * ui_Label14;
 void ui_event_btnForgetWifi(lv_event_t * e);
 extern lv_obj_t * ui_btnForgetWifi;
 extern lv_obj_t * ui_Label25;
+void ui_event_btnBack(lv_event_t * e);
+extern lv_obj_t * ui_btnBack;
+extern lv_obj_t * ui_Label28;
 // SCREEN: ui_WifiScanResult
 void ui_WifiScanResult_screen_init(void);
 extern lv_obj_t * ui_WifiScanResult;

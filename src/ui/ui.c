@@ -38,6 +38,35 @@ lv_obj_t * ui_Statistic;
 lv_obj_t * ui_Arc2;
 lv_obj_t * ui_Param;
 lv_obj_t * ui_Settings;
+lv_obj_t * ui_Container2;
+lv_obj_t * ui_lblWifiSwitch;
+void ui_event_btnWifi(lv_event_t * e);
+lv_obj_t * ui_btnWifi;
+lv_obj_t * ui_Label5;
+void ui_event_btnMQTT(lv_event_t * e);
+lv_obj_t * ui_btnMQTT;
+lv_obj_t * ui_Label30;
+lv_obj_t * ui_ContDarkMode;
+lv_obj_t * ui_lblDarkMode;
+void ui_event_Switch2(lv_event_t * e);
+lv_obj_t * ui_Switch2;
+lv_obj_t * ui_ContBackLigth;
+lv_obj_t * ui_lblBackLight;
+void ui_event_switchManualAutomatic(lv_event_t * e);
+lv_obj_t * ui_switchManualAutomatic;
+lv_obj_t * ui_Label6;
+lv_obj_t * ui_lblLigthSensorValue;
+void ui_event_LigthSensorSlider(lv_event_t * e);
+lv_obj_t * ui_LigthSensorSlider;
+lv_obj_t * ui_lblLigthSensorSliderValue;
+lv_obj_t * ui_ContLanguage;
+lv_obj_t * ui_lblLanguage;
+lv_obj_t * ui_DropdownLanguage;
+lv_obj_t * ui_ContRotateScreen;
+lv_obj_t * ui_lblrotate;
+void ui_event_btnRotate(lv_event_t * e);
+lv_obj_t * ui_btnRotate;
+lv_obj_t * ui_Label7;
 lv_obj_t * ui_About;
 lv_obj_t * ui_ConBuildDate;
 lv_obj_t * ui_lblBuildDate;
@@ -65,8 +94,6 @@ lv_obj_t * ui_imWifiConnected2;
 lv_obj_t * ui_imWifiDisconnected2;
 lv_obj_t * ui_imInternetOK2;
 lv_obj_t * ui_imInternetNOK2;
-lv_obj_t * ui_lblTime1;
-lv_obj_t * ui_Label28;
 lv_obj_t * ui_Container3;
 lv_obj_t * ui_Container9;
 lv_obj_t * ui_Label4;
@@ -90,14 +117,17 @@ lv_obj_t * ui_Container16;
 lv_obj_t * ui_Label27;
 lv_obj_t * ui_lblTime;
 lv_obj_t * ui_lblTimeZone;
-void ui_event_Button3(lv_event_t * e);
-lv_obj_t * ui_Button3;
+void ui_event_btnScanWifi(lv_event_t * e);
+lv_obj_t * ui_btnScanWifi;
 lv_obj_t * ui_Label11;
 lv_obj_t * ui_Container15;
 lv_obj_t * ui_Label14;
 void ui_event_btnForgetWifi(lv_event_t * e);
 lv_obj_t * ui_btnForgetWifi;
 lv_obj_t * ui_Label25;
+void ui_event_btnBack(lv_event_t * e);
+lv_obj_t * ui_btnBack;
+lv_obj_t * ui_Label28;
 
 
 // SCREEN: ui_WifiScanResult
@@ -170,7 +200,58 @@ lv_obj_t * ui____initial_actions0;
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
-void ui_event_Button3(lv_event_t * e)
+void ui_event_btnWifi(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Wifi_Settings, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Wifi_Settings_screen_init);
+    }
+}
+void ui_event_btnMQTT(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Wifi_Settings, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Wifi_Settings_screen_init);
+    }
+}
+void ui_event_Switch2(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_switch_theme(UI_THEME_DARK_MODE);
+    }
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  !lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_switch_theme(UI_THEME_DEFAULT);
+    }
+}
+void ui_event_switchManualAutomatic(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        funcManualAutomatic(e);
+    }
+}
+void ui_event_LigthSensorSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        _ui_slider_set_text_value(ui_lblLigthSensorSliderValue, target, "", "%");
+    }
+}
+void ui_event_btnRotate(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        funcRotateScreen(e);
+    }
+}
+void ui_event_btnScanWifi(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -184,6 +265,14 @@ void ui_event_btnForgetWifi(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         funcResetWifi(e);
+    }
+}
+void ui_event_btnBack(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Main_Screen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Main_Screen_screen_init);
     }
 }
 void ui_event_funcWifiScan(lv_event_t * e)

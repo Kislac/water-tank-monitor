@@ -392,13 +392,45 @@ void runtimecalc(){
     }
   }
 }
+s
+void AutoBacklight(){
+  #ifdef BOARD_HAS_CDS
+  static ulong last_AutoBacklight = 0;
+
+  if (millis() - last_AutoBacklight >= 100) { // Refresh every 100ms
+    last_AutoBacklight = millis();
+        auto cdr = analogReadMilliVolts(CDS);
+        sprintf(text_buffer, "%d", cdr);
+        if (lv_tabview_get_tab_act(ui_TabView2) == 3) {
+            lv_label_set_text(ui_lblLigthSensorValue, text_buffer);
+        }
+        
+        if (lv_obj_get_state(ui_switchManualAutomatic) & LV_STATE_CHECKED) {
+            float adaptive_brightness = smartdisplay_lcd_adaptive_brightness_cds();
+            smartdisplay_lcd_set_backlight(adaptive_brightness);
+            if (lv_tabview_get_tab_act(ui_TabView2) == 3) {
+              int slider_value = (int)(adaptive_brightness * 100);
+              lv_slider_set_value(ui_LigthSensorSlider, slider_value, LV_ANIM_OFF);
+              sprintf(text_buffer, "%d%%", slider_value);
+              lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
+            }
+        }
+  }
+  #endif
+}
+
+void funcRotateScreen(lv_event_t * e){
+  static bool rotated = false;
+  rotated = !rotated; // Toggle rotation state
+  lv_disp_set_rotation(lv_disp_get_default(), rotated ? LV_DISPLAY_ROTATION_180 : LV_DISPLAY_ROTATION_0);
+  Serial.printf("Screen rotated to %s\n", rotated ? "180°" : "0°");
+}
+
 
 void setup() {
   Serial.begin(115200);
 
-  //wifi
-  WiFi.mode(WIFI_STA);
-  WiFi.begin();
+  
 
 
   smartdisplay_init();
@@ -411,12 +443,26 @@ void setup() {
 
   Serial.println("Starting the program...");
 
+  // Set the screen brightness to 50% initially
+  smartdisplay_lcd_set_backlight(max(((float)(SCREEN_INITIAL_BRIGHTNESS) / 100), 0.01f));
+  // Update the ui_LigthSensorSlider to reflect the 50% brightness
+  lv_slider_set_value(ui_LigthSensorSlider, SCREEN_INITIAL_BRIGHTNESS, LV_ANIM_OFF);
+  sprintf(text_buffer, "%d%%", SCREEN_INITIAL_BRIGHTNESS);
+  lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
 
-// Init the Wifi Signal images. Important to init after ui_init()
-initWifiSignalImages();
+  // Set the switch to manual mode initially
+  lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_DEFAULT);
+  funcManualAutomatic(nullptr);    // Call the funcManualAutomatic function after setting the switch
 
 
-initializeBuildInfo();
+  //wifi
+  WiFi.mode(WIFI_STA);
+  WiFi.begin();
+  // Init the Wifi Signal images. Important to init after ui_init()
+  initWifiSignalImages();
+
+
+  initializeBuildInfo();
 
 }
 
@@ -424,7 +470,7 @@ void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
     runtimecalc();
-    //AutoBacklight();
+    AutoBacklight();
     RefreshWifiParameters();
     refreshStatus();
       // Update the ticker

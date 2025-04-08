@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+void funcManualAutomatic(lv_event_t * e);
+void funcRotateScreen(lv_event_t * e);
 void funcResetWifi(lv_event_t * e);
 void funcWifiScan(lv_event_t * e);
 void ConnectToWifiButtonPress(lv_event_t * e);
