@@ -10,12 +10,15 @@
 extern "C" {
 #endif
 
-void funcManualAutomatic(lv_event_t * e);
+void funcResetMinMaxDistance(lv_event_t * e);
 void funcRotateScreen(lv_event_t * e);
+void funcSWReset(lv_event_t * e);
 void funcResetWifi(lv_event_t * e);
 void funcWifiScan(lv_event_t * e);
-void ConnectToWifiButtonPress(lv_event_t * e);
-void RetryButtonWrongPassword(lv_event_t * e);
+void funcConnectToWifiButtonPress(lv_event_t * e);
+void funcRetryButtonWrongPassword(lv_event_t * e);
+void funcSaveMQTTCredentials(lv_event_t * e);
+void funcForgetMQTTSettings(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

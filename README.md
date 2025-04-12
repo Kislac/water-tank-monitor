@@ -56,3 +56,51 @@ to D:\GIT\water-tank-monitor\include and rename to
 provide lvgl.h config path to pf.ini --> -D LV_CONF_PATH="D:\GIT\water-tank-monitor\include\lv_conf.h"
 
 add lvgl/lvgl@^9.2.2 library to the project
+
+
+
+
+
+
+
+✅ Ajánlott kiosztás például:
+Érpár	Szín	Jel
+1	Zöld + Zöld/fehér	SDA + GND
+2	Narancs + Narancs/fehér	SCL + GND
+3	Kék + Kék/fehér	+5V + üres
+4	Barna + Barna/fehér	opcionális: LED vagy más GPIO
+
+Használj alacsonyabb I2C sebességet (pl. 100kHz)
+Húzz fel erősebb pull-up ellenállásokat (pl. 2.2kΩ helyett 1.5kΩ)
+
+Az I2C specifikáció szerint pull-up ellenállás kell SDA és SCL vonalra.
+
+Hossz	Jelszint	Javasolt pull-up
+< 1 m	3.3V	4.7kΩ – 10kΩ
+5–6 m	3.3V	2.2kΩ – 3.3kΩ
+
+
+
+📊 Példakapcsolás
+lua
+Copy
+Edit
+ESP32
+  ├── SDA ---[2.2kΩ]---+--- SDA wire ---> VL53L1X & AHT10
+  │                   |
+  │                  3.3V
+  └── SCL ---[2.2kΩ]---+--- SCL wire ---> VL53L1X & AHT10
+
+VL53L1X & AHT10
+  └── 3.3V ---||--- GND (100nF + 10µF párhuzamosan)
+
+
+T568B kiosztás:
+1. Narancs/Fehér    --> GND
+2. Narancs          --> SCL
+3. Zöld/Fehér       --> GND
+4. Kék              --> +5
+5. Kék/Fehér        --> Üres
+6. Zöld             --> SCA
+7. Barna/Fehér      --> Üres
+8. Barna            --> Üres

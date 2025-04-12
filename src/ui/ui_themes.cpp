@@ -14,7 +14,7 @@ const ui_theme_variable_t _ui_theme_alpha_FontColor[2] = {255, 255};
 
 const ui_theme_variable_t _ui_theme_color_Border[2] = {0x2C2C2C, 0xB1B1B1};
 const ui_theme_variable_t _ui_theme_alpha_Border[2] = {255, 255};
-uint8_t ui_theme_idx = UI_THEME_DARK_MODE;
+uint8_t ui_theme_idx = UI_THEME_DEFAULT;
 
 
 void ui_theme_set(uint8_t theme_idx)
