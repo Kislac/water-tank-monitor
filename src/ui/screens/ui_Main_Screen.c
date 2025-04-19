@@ -591,6 +591,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaRectangleWide, 20);
     lv_obj_set_x(ui_TextAreaRectangleWide, 189);
     lv_obj_set_y(ui_TextAreaRectangleWide, 0);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaRectangleWide, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaRectangleWide, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaRectangleWide, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaRectangleWide, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaRectangleWide, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -604,6 +606,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaRectangleDepth, 20);
     lv_obj_set_x(ui_TextAreaRectangleDepth, 189);
     lv_obj_set_y(ui_TextAreaRectangleDepth, 20);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaRectangleDepth, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaRectangleDepth, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaRectangleDepth, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaRectangleDepth, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaRectangleDepth, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -617,6 +621,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaRectangleHeight, 20);
     lv_obj_set_x(ui_TextAreaRectangleHeight, 189);
     lv_obj_set_y(ui_TextAreaRectangleHeight, 40);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaRectangleHeight, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaRectangleHeight, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaRectangleHeight, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaRectangleHeight, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaRectangleHeight, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -668,6 +674,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaCilinderDiameter, 20);
     lv_obj_set_x(ui_TextAreaCilinderDiameter, 189);
     lv_obj_set_y(ui_TextAreaCilinderDiameter, 0);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaCilinderDiameter, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaCilinderDiameter, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaCilinderDiameter, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaCilinderDiameter, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaCilinderDiameter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -681,6 +689,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaCilinderHeight, 20);
     lv_obj_set_x(ui_TextAreaCilinderHeight, 189);
     lv_obj_set_y(ui_TextAreaCilinderHeight, 20);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaCilinderHeight, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaCilinderHeight, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaCilinderHeight, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaCilinderHeight, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaCilinderHeight, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -732,6 +742,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaEmptyTank, 20);
     lv_obj_set_x(ui_TextAreaEmptyTank, 189);
     lv_obj_set_y(ui_TextAreaEmptyTank, 0);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaEmptyTank, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaEmptyTank, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaEmptyTank, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaEmptyTank, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaEmptyTank, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -745,6 +757,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_height(ui_TextAreaFullTank, 20);
     lv_obj_set_x(ui_TextAreaFullTank, 189);
     lv_obj_set_y(ui_TextAreaFullTank, 20);
+    if("0123456789" == "") lv_textarea_set_accepted_chars(ui_TextAreaFullTank, NULL);
+    else lv_textarea_set_accepted_chars(ui_TextAreaFullTank, "0123456789");
     lv_textarea_set_placeholder_text(ui_TextAreaFullTank, "1-9999");
     lv_obj_set_style_pad_left(ui_TextAreaFullTank, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_TextAreaFullTank, 0, LV_PART_MAIN | LV_STATE_DEFAULT);

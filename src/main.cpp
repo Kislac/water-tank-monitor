@@ -82,6 +82,7 @@ uint16_t global_cilDiameter = 0;
 uint16_t global_cilHeight = 0;
 uint16_t global_emptyTank = 0;
 uint16_t global_fullTank = 0;
+uint16_t global_MaxTankLevel = 0;
 
 
 void initializeBuildInfo()
@@ -646,7 +647,7 @@ void DistanceSensorRead() {
 
         sprintf(text_buffer, "%d mm", distance);
         lv_label_set_text(ui_lblActualDistanceValue, text_buffer);
-        lv_label_set_text(ui_lblCurrentLiter, text_buffer);
+        //lv_label_set_text(ui_lblCurrentLiter, text_buffer);
 
 
         //
@@ -746,6 +747,27 @@ void DistanceSensorRead() {
   }
 }
 
+void ReadTankLevelinLiters() {
+//  static ulong lastTankLevelReadTime = 0;
+//  ulong currentTankLevelTime = millis();
+//
+//  if (currentTankLevelTime - lastTankLevelReadTime >= 1000) {
+//    lastTankLevelReadTime = currentTankLevelTime;
+//
+//    // Calculate the tank level based on the distance
+//    int tankLevel = global_fullTank - sensor.ranging_data.range_mm; // Assuming full tank is at 0 mm distance
+//
+//    if (tankLevel < 0) {
+//      tankLevel = 0; // Tank is empty
+//    } else if (tankLevel > global_fullTank) {
+//      tankLevel = global_fullTank; // Tank is full
+//    }
+//
+//    sprintf(text_buffer, "%d L", tankLevel);
+//    lv_label_set_text(ui_lblCurrentLiter, text_buffer);
+//  }
+}
+
 void ReinitializeVL53L1X() {
   static ulong lastReinitTime = 0;
   ulong currentTime = millis();
@@ -843,7 +865,39 @@ void ReadTankParamsFromEEPROM() {
   EEPROM.end();
 
   Serial.println("Tank parameters loaded from EEPROM.");
+  // Print loaded tank parameters to Serial
+  Serial.printf("Tank Type: %u\n", global_tankType);
+  Serial.printf("Rectangle Wide: %u\n", global_rectWide);
+  Serial.printf("Rectangle Depth: %u\n", global_rectDepth);
+  Serial.printf("Rectangle Height: %u\n", global_rectHeight);
+  Serial.printf("Cylinder Diameter: %u\n", global_cilDiameter);
+  Serial.printf("Cylinder Height: %u\n", global_cilHeight);
+  Serial.printf("Empty Tank: %u\n", global_emptyTank);
+  Serial.printf("Full Tank: %u\n", global_fullTank);
+
+  // Call funcTankTypeChanged to update UI containers
+  funcTankTypeChanged(nullptr);
 }
+
+void CalcMaxTanklevel() {
+  // Calculate global_MaxTankLevel in liters (dm^3)
+	if (global_tankType == 0) { // Cilinder
+		// Volume = π * r^2 * h
+		float radius = global_cilDiameter / 2.0f; // mm
+		float volume_mm3 = 3.14159265f * radius * radius * global_cilHeight;
+		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
+	} else if (global_tankType == 1) { // Rectangle
+		// Volume = width * depth * height
+		float volume_mm3 = global_rectWide * global_rectDepth * global_rectHeight;
+		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
+	}
+  // Update the UI label with the calculated maximum tank level
+  sprintf(text_buffer, "%u L", global_MaxTankLevel);
+  lv_label_set_text(ui_lblMaxValue, text_buffer);
+  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
+	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
+}
+
 
 
 void setup() {
@@ -911,6 +965,8 @@ void setup() {
   initializeBuildInfo();
   ReadMQTTSettingsFromEEPROM();
   ReadTankParamsFromEEPROM();
+  CalcMaxTanklevel();
+
 
   Serial.begin(115200);
 

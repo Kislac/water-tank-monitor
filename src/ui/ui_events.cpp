@@ -408,30 +408,49 @@ void funcParamKeyboardOk(lv_event_t * e)
 void funcParamSave(lv_event_t * e)
 {
 	// Read values from UI
-	uint8_t tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
-	uint16_t rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
-	uint16_t rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
-	uint16_t rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
-	uint16_t cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
-	uint16_t cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
-	uint16_t emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
-	uint16_t fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+	uint8_t global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	uint16_t global_rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
+	uint16_t global_rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
+	uint16_t global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
+	uint16_t global_cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
+	uint16_t global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
+	uint16_t global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
+	uint16_t global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
 
 	// Save to EEPROM (compatible with MQTT layout: tank params after MQTT block)
 	// MQTT block: 0-192 (see: 0=flag, 1-64=server, 65-128=user, 129-192=pass)
 	// Tank params start at 193
 	const int tankParamBase = 193;
 	EEPROM.begin(512); // Use same size as MQTT
-	EEPROM.write(tankParamBase + 0, tankType);
-	EEPROM.put(tankParamBase + 1, rectWide);
-	EEPROM.put(tankParamBase + 3, rectDepth);
-	EEPROM.put(tankParamBase + 5, rectHeight);
-	EEPROM.put(tankParamBase + 7, cilDiameter);
-	EEPROM.put(tankParamBase + 9, cilHeight);
-	EEPROM.put(tankParamBase + 11, emptyTank);
-	EEPROM.put(tankParamBase + 13, fullTank);
+	EEPROM.write(tankParamBase + 0, global_tankType);
+	EEPROM.put(tankParamBase + 1, global_rectWide);
+	EEPROM.put(tankParamBase + 3, global_rectDepth);
+	EEPROM.put(tankParamBase + 5, global_rectHeight);
+	EEPROM.put(tankParamBase + 7, global_cilDiameter);
+	EEPROM.put(tankParamBase + 9, global_cilHeight);
+	EEPROM.put(tankParamBase + 11, global_emptyTank);
+	EEPROM.put(tankParamBase + 13, global_fullTank);
 	EEPROM.commit();
 	EEPROM.end();
 
 	Serial.println("Tank parameters saved to EEPROM.");
+
+	
+	// Call CalcMaxTanklevel from main.cpp to recalculate tank level
+	if (global_tankType == 0) { // Cilinder
+		// Volume = π * r^2 * h
+		float radius = global_cilDiameter / 2.0f; // mm
+		float volume_mm3 = 3.14159265f * radius * radius * global_cilHeight;
+		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
+	} else if (global_tankType == 1) { // Rectangle
+		// Volume = width * depth * height
+		float volume_mm3 = global_rectWide * global_rectDepth * global_rectHeight;
+		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
+	}
+	char text_buffer[32];
+	sprintf(text_buffer, "%u L", (unsigned int)global_MaxTankLevel);
+	lv_label_set_text(ui_lblMaxValue, text_buffer);
+	// Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
+	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
 }
+

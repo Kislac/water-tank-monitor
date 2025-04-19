@@ -82,3 +82,7 @@ def funcParamFullTank(event_struct):
 def funcParamKeyboardOk(event_struct):
     return
 
+
+def funcParamSave(event_struct):
+    return
+
