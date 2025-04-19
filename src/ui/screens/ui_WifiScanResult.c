@@ -12,6 +12,33 @@ void ui_WifiScanResult_screen_init(void)
     lv_obj_set_style_pad_row(ui_WifiScanResult, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_WifiScanResult, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_TopInfoBar5 = lv_obj_create(ui_WifiScanResult);
+    lv_obj_remove_style_all(ui_TopInfoBar5);
+    lv_obj_set_width(ui_TopInfoBar5, 318);
+    lv_obj_set_height(ui_TopInfoBar5, LV_SIZE_CONTENT);    /// 50
+    lv_obj_set_x(ui_TopInfoBar5, 1);
+    lv_obj_set_y(ui_TopInfoBar5, 1);
+    lv_obj_remove_flag(ui_TopInfoBar5, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_object_set_themeable_style_property(ui_TopInfoBar5, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
+                                           _ui_theme_color_BackGround);
+    ui_object_set_themeable_style_property(ui_TopInfoBar5, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
+                                           _ui_theme_alpha_BackGround);
+    ui_object_set_themeable_style_property(ui_TopInfoBar5, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR,
+                                           _ui_theme_color_Border);
+    ui_object_set_themeable_style_property(ui_TopInfoBar5, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BORDER_OPA,
+                                           _ui_theme_alpha_Border);
+    lv_obj_set_style_border_width(ui_TopInfoBar5, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Spinner6 = lv_spinner_create(ui_TopInfoBar5);
+    //lv_spinner_set_anim_params(ui_Spinner6, 1000, 90);
+    lv_obj_set_width(ui_Spinner6, 20);
+    lv_obj_set_height(ui_Spinner6, 20);
+    lv_obj_set_align(ui_Spinner6, LV_ALIGN_RIGHT_MID);
+    lv_obj_remove_flag(ui_Spinner6, LV_OBJ_FLAG_CLICKABLE);      /// Flags
+    lv_obj_set_style_arc_width(ui_Spinner6, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_arc_width(ui_Spinner6, 5, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
     ui_Container1 = lv_obj_create(ui_WifiScanResult);
     lv_obj_remove_style_all(ui_Container1);
     lv_obj_set_width(ui_Container1, 318);

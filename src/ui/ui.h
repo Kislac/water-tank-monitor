@@ -22,10 +22,9 @@ void ui_Main_Screen_screen_init(void);
 extern lv_obj_t * ui_Main_Screen;
 extern lv_obj_t * ui_TopInfoBar1;
 extern lv_obj_t * ui_Spinner2;
-extern lv_obj_t * ui_imWifiConnected4;
-extern lv_obj_t * ui_imWifiDisconnected4;
-extern lv_obj_t * ui_imInternetOK4;
-extern lv_obj_t * ui_imInternetNOK4;
+extern lv_obj_t * ui_imWifiInternetOK1;
+extern lv_obj_t * ui_imWifiDisconnected1;
+extern lv_obj_t * ui_imWifiConnectedNoInternet1;
 extern lv_obj_t * ui_lblDataNTime;
 extern lv_obj_t * ui_MainTabView;
 extern lv_obj_t * ui_Main;
@@ -61,6 +60,45 @@ void ui_event_Button1(lv_event_t * e);
 extern lv_obj_t * ui_Button1;
 extern lv_obj_t * ui_Label31;
 extern lv_obj_t * ui_Param;
+extern lv_obj_t * ui_ContTankType;
+extern lv_obj_t * ui_Label32;
+void ui_event_DropdownParamTankType(lv_event_t * e);
+extern lv_obj_t * ui_DropdownParamTankType;
+extern lv_obj_t * ui_ContRectangle;
+extern lv_obj_t * ui_lblWide;
+extern lv_obj_t * ui_lblDepth;
+extern lv_obj_t * ui_lblHeight;
+extern lv_obj_t * ui_Label35;
+void ui_event_TextAreaRectangleWide(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaRectangleWide;
+void ui_event_TextAreaRectangleDepth(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaRectangleDepth;
+void ui_event_TextAreaRectangleHeight(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaRectangleHeight;
+extern lv_obj_t * ui_ContCilinder;
+extern lv_obj_t * ui_lblDiameter;
+extern lv_obj_t * ui_lblHeight1;
+extern lv_obj_t * ui_Label33;
+void ui_event_TextAreaCilinderDiameter(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaCilinderDiameter;
+void ui_event_TextAreaCilinderHeight(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaCilinderHeight;
+extern lv_obj_t * ui_ContMinMax;
+extern lv_obj_t * ui_lblDiameter1;
+extern lv_obj_t * ui_lblHeight2;
+extern lv_obj_t * ui_Label34;
+void ui_event_TextAreaEmptyTank(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaEmptyTank;
+void ui_event_TextAreaFullTank(lv_event_t * e);
+extern lv_obj_t * ui_TextAreaFullTank;
+extern lv_obj_t * ui_ContButtons;
+extern lv_obj_t * ui_Button2;
+extern lv_obj_t * ui_Label36;
+void ui_event_Button3(lv_event_t * e);
+extern lv_obj_t * ui_Button3;
+extern lv_obj_t * ui_Label37;
+void ui_event_ParamKeyboard(lv_event_t * e);
+extern lv_obj_t * ui_ParamKeyboard;
 extern lv_obj_t * ui_Settings;
 extern lv_obj_t * ui_Container2;
 extern lv_obj_t * ui_lblWifiSwitch;
@@ -116,10 +154,6 @@ void ui_Wifi_Settings_screen_init(void);
 extern lv_obj_t * ui_Wifi_Settings;
 extern lv_obj_t * ui_TopInfoBar2;
 extern lv_obj_t * ui_Spinner4;
-extern lv_obj_t * ui_imWifiConnected2;
-extern lv_obj_t * ui_imWifiDisconnected2;
-extern lv_obj_t * ui_imInternetOK2;
-extern lv_obj_t * ui_imInternetNOK2;
 extern lv_obj_t * ui_Container3;
 extern lv_obj_t * ui_Container9;
 extern lv_obj_t * ui_Label4;
@@ -157,6 +191,8 @@ extern lv_obj_t * ui_Label28;
 // SCREEN: ui_WifiScanResult
 void ui_WifiScanResult_screen_init(void);
 extern lv_obj_t * ui_WifiScanResult;
+extern lv_obj_t * ui_TopInfoBar5;
+extern lv_obj_t * ui_Spinner6;
 extern lv_obj_t * ui_Container1;
 extern lv_obj_t * ui_Label1;
 void ui_event_funcWifiScan(lv_event_t * e);
@@ -174,10 +210,6 @@ void ui_ConnectToWifi_screen_init(void);
 extern lv_obj_t * ui_ConnectToWifi;
 extern lv_obj_t * ui_TopInfoBar3;
 extern lv_obj_t * ui_Spinner3;
-extern lv_obj_t * ui_imWifiConnected3;
-extern lv_obj_t * ui_imWifiDisconnected3;
-extern lv_obj_t * ui_imInternetOK3;
-extern lv_obj_t * ui_imInternetNOK3;
 void ui_event_Keyboard1(lv_event_t * e);
 extern lv_obj_t * ui_Keyboard1;
 extern lv_obj_t * ui_Container4;
@@ -211,10 +243,6 @@ void ui_MQTTSettings_screen_init(void);
 extern lv_obj_t * ui_MQTTSettings;
 extern lv_obj_t * ui_TopInfoBar;
 extern lv_obj_t * ui_Spinner1;
-extern lv_obj_t * ui_imWifiConnected1;
-extern lv_obj_t * ui_imWifiDisconnected1;
-extern lv_obj_t * ui_imInternetOK1;
-extern lv_obj_t * ui_imInternetNOK1;
 extern lv_obj_t * ui_ContMQTTServer;
 extern lv_obj_t * ui_lblMQTTlbl;
 void ui_event_TextAreaMQTTServer(lv_event_t * e);
@@ -236,17 +264,14 @@ extern lv_obj_t * ui_lblBack1;
 void ui_event_Forget(lv_event_t * e);
 extern lv_obj_t * ui_Forget;
 extern lv_obj_t * ui_lblBack2;
-extern lv_obj_t * ui_Connect;
-extern lv_obj_t * ui_lblBack3;
 void ui_event_KeyboardMQTT(lv_event_t * e);
 extern lv_obj_t * ui_KeyboardMQTT;
 extern lv_obj_t * ui____initial_actions0;
 
 
-LV_IMG_DECLARE(ui_img_1628538605);    // assets/wifi (4).png
-LV_IMG_DECLARE(ui_img_1718934963);    // assets/wifi-off-disabled-bold (1).png
-LV_IMG_DECLARE(ui_img_communicator_png);    // assets/communicator.png
-LV_IMG_DECLARE(ui_img_478874422);    // assets/communicator-off-disabled-light.png
+LV_IMG_DECLARE(ui_img_wifiinternetok_png);    // assets/WifiInternetOK.png
+LV_IMG_DECLARE(ui_img_wifidisconnected_png);    // assets/WifiDisconnected.png
+LV_IMG_DECLARE(ui_img_wificonnectednointernet_png);    // assets/WifiConnectedNoInternet.png
 
 
 

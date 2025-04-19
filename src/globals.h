@@ -14,5 +14,12 @@ extern int global_minDistance; // Initialize to maximum possible value
 extern int global_maxDistance; // Initialize to minimum possible value    
     
 
-
+    extern uint8_t global_tankType;
+    extern uint16_t global_rectWide;
+    extern uint16_t global_rectDepth;
+    extern uint16_t global_rectHeight;
+    extern uint16_t global_cilDiameter;
+    extern uint16_t global_cilHeight;
+    extern uint16_t global_emptyTank;
+    extern uint16_t global_fullTank;
 #endif // GLOBALS_H

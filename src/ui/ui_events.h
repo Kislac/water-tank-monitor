@@ -11,6 +11,16 @@ extern "C" {
 #endif
 
 void funcResetMinMaxDistance(lv_event_t * e);
+void funcTankTypeChanged(lv_event_t * e);
+void funcParamRectangleWide(lv_event_t * e);
+void funcParamRectangleDepth(lv_event_t * e);
+void funcParamRectangleHeight(lv_event_t * e);
+void funcParamCilinderDiameter(lv_event_t * e);
+void funcParamCilinderHeight(lv_event_t * e);
+void funcParamEmptyTank(lv_event_t * e);
+void funcParamFullTank(lv_event_t * e);
+void funcParamSave(lv_event_t * e);
+void funcParamKeyboardOk(lv_event_t * e);
 void funcRotateScreen(lv_event_t * e);
 void funcSWReset(lv_event_t * e);
 void funcResetWifi(lv_event_t * e);

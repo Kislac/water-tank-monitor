@@ -46,3 +46,39 @@ def funcForgetMQTTSettings(event_struct):
 def funcResetMinMaxDistance(event_struct):
     return
 
+
+def funcTankTypeChanged(event_struct):
+    return
+
+
+def funcParamRectangleWide(event_struct):
+    return
+
+
+def funcParamRectangleDepth(event_struct):
+    return
+
+
+def funcParamRectangleHeight(event_struct):
+    return
+
+
+def funcParamCilinderDiameter(event_struct):
+    return
+
+
+def funcParamCilinderHeight(event_struct):
+    return
+
+
+def funcParamEmptyTank(event_struct):
+    return
+
+
+def funcParamFullTank(event_struct):
+    return
+
+
+def funcParamKeyboardOk(event_struct):
+    return
+

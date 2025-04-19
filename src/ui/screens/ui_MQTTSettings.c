@@ -31,42 +31,6 @@ void ui_MQTTSettings_screen_init(void)
 
     lv_obj_set_style_arc_width(ui_Spinner1, 5, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    ui_imWifiConnected1 = lv_image_create(ui_TopInfoBar);
-    lv_image_set_src(ui_imWifiConnected1, &ui_img_1628538605);
-    lv_obj_set_width(ui_imWifiConnected1, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imWifiConnected1, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_align(ui_imWifiConnected1, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imWifiConnected1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imWifiConnected1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imWifiDisconnected1 = lv_image_create(ui_TopInfoBar);
-    lv_image_set_src(ui_imWifiDisconnected1, &ui_img_1718934963);
-    lv_obj_set_width(ui_imWifiDisconnected1, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imWifiDisconnected1, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_align(ui_imWifiDisconnected1, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imWifiDisconnected1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imWifiDisconnected1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imInternetOK1 = lv_image_create(ui_TopInfoBar);
-    lv_image_set_src(ui_imInternetOK1, &ui_img_communicator_png);
-    lv_obj_set_width(ui_imInternetOK1, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imInternetOK1, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_x(ui_imInternetOK1, 20);
-    lv_obj_set_y(ui_imInternetOK1, 0);
-    lv_obj_set_align(ui_imInternetOK1, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imInternetOK1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imInternetOK1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imInternetNOK1 = lv_image_create(ui_TopInfoBar);
-    lv_image_set_src(ui_imInternetNOK1, &ui_img_478874422);
-    lv_obj_set_width(ui_imInternetNOK1, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imInternetNOK1, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_x(ui_imInternetNOK1, 20);
-    lv_obj_set_y(ui_imInternetNOK1, 0);
-    lv_obj_set_align(ui_imInternetNOK1, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imInternetNOK1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imInternetNOK1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
     ui_ContMQTTServer = lv_obj_create(ui_MQTTSettings);
     lv_obj_remove_style_all(ui_ContMQTTServer);
     lv_obj_set_width(ui_ContMQTTServer, 318);
@@ -166,9 +130,9 @@ void ui_MQTTSettings_screen_init(void)
 
 
     ui_Back = lv_button_create(ui_MQTTSettings);
-    lv_obj_set_width(ui_Back, 100);
     lv_obj_set_height(ui_Back, 30);
-    lv_obj_set_x(ui_Back, 100);
+    lv_obj_set_width(ui_Back, lv_pct(30));
+    lv_obj_set_x(ui_Back, 105);
     lv_obj_set_y(ui_Back, 88);
     lv_obj_set_align(ui_Back, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_Back, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
@@ -181,10 +145,10 @@ void ui_MQTTSettings_screen_init(void)
     lv_label_set_text(ui_lblBack, "Back");
 
     ui_Save = lv_button_create(ui_MQTTSettings);
-    lv_obj_set_width(ui_Save, 100);
     lv_obj_set_height(ui_Save, 30);
-    lv_obj_set_x(ui_Save, -92);
-    lv_obj_set_y(ui_Save, 45);
+    lv_obj_set_width(ui_Save, lv_pct(30));
+    lv_obj_set_x(ui_Save, -105);
+    lv_obj_set_y(ui_Save, 88);
     lv_obj_set_align(ui_Save, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_Save, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_Save, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -196,10 +160,10 @@ void ui_MQTTSettings_screen_init(void)
     lv_label_set_text(ui_lblBack1, "Save");
 
     ui_Forget = lv_button_create(ui_MQTTSettings);
-    lv_obj_set_width(ui_Forget, 100);
     lv_obj_set_height(ui_Forget, 30);
-    lv_obj_set_x(ui_Forget, 99);
-    lv_obj_set_y(ui_Forget, 42);
+    lv_obj_set_width(ui_Forget, lv_pct(30));
+    lv_obj_set_x(ui_Forget, 0);
+    lv_obj_set_y(ui_Forget, 88);
     lv_obj_set_align(ui_Forget, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_Forget, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_Forget, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -209,21 +173,6 @@ void ui_MQTTSettings_screen_init(void)
     lv_obj_set_height(ui_lblBack2, LV_SIZE_CONTENT);    /// 30
     lv_obj_set_align(ui_lblBack2, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lblBack2, "Forget");
-
-    ui_Connect = lv_button_create(ui_MQTTSettings);
-    lv_obj_set_width(ui_Connect, 100);
-    lv_obj_set_height(ui_Connect, 30);
-    lv_obj_set_x(ui_Connect, -90);
-    lv_obj_set_y(ui_Connect, 90);
-    lv_obj_set_align(ui_Connect, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Connect, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_Connect, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_lblBack3 = lv_label_create(ui_Connect);
-    lv_obj_set_width(ui_lblBack3, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_lblBack3, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_lblBack3, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblBack3, "Connect");
 
     ui_KeyboardMQTT = lv_keyboard_create(ui_MQTTSettings);
     lv_obj_set_width(ui_KeyboardMQTT, 320);

@@ -74,12 +74,12 @@ void funcWifiScan(lv_event_t * e)
   
 	  // Create a label to display the number of WiFi networks found
 	  lv_obj_t *ui_LabelWifiCount = lv_label_create(ui_PanelWifiList);
-	  lv_label_set_text_fmt(ui_LabelWifiCount, "Found %d networks. Closest 12 listed:", n);
-	  //lv_obj_set_style_text_font(ui_LabelWifiCount, &lv_font_montserrat_12, 0); // Set font size to small
+	  lv_label_set_text_fmt(ui_LabelWifiCount, "Found %d networks. Closest 8 listed:", n);
+	  //lv_obj_set_style_text_font(ui_LabelWifiCount, &lv_font_montserrat_8, 0); // Set font size to small
 	  lv_obj_set_style_text_align(ui_LabelWifiCount, LV_TEXT_ALIGN_LEFT, 0);
 	  lv_obj_align(ui_LabelWifiCount, LV_ALIGN_TOP_LEFT, 10, 15); // Position the label at the top-left corner
   
-	  for (int i = 0; i < 12; ++i) {
+	  for (int i = 0; i < 8; ++i) {
 		
 		String ssid = WiFi.SSID(i);
 		char ssid_text[16];
@@ -299,4 +299,139 @@ void funcResetMinMaxDistance(lv_event_t * e)
 {
 	global_minDistance = 0; // Initialize to maximum possible value
 	global_maxDistance = 0; // Initialize to minimum possible value 
+}
+
+void funcTankTypeChanged(lv_event_t * e)
+{
+	int selected_idx = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	static char selected[32];
+	printf("Selected tank type: %d\n", selected_idx);
+	//lv_dropdown_get_option(ui_DropdownParamTankType, selected_idx, selected, sizeof(selected));
+	if (selected_idx == 0) {//Cilinder
+		lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	} else if (selected_idx == 1) {//Rectangle
+		lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	}
+}
+
+void funcParamRectangleWide(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamRectangleDepth(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamRectangleHeight(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamCilinderDiameter(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamCilinderHeight(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamEmptyTank(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamFullTank(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+}
+
+void funcParamKeyboardOk(lv_event_t * e)
+{
+	// Your code here
+	//ui_ContTankType
+	//ui_ContRectangle
+	//ui_ContCilinder
+	//ui_ContMinMax
+	//ui_ContButtons
+	//ui_ParamKeyboard
+	lv_obj_add_flag(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN);
+
+	lv_obj_clear_flag(ui_ContTankType, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
+
+	int selected_idx = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	static char selected[32];
+	if (selected_idx == 0) {//Cilinder
+		lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	} else if (selected_idx == 1) {//Rectangle
+		lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	}
+}
+
+void funcParamSave(lv_event_t * e)
+{
+	// Read values from UI
+	uint8_t tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	uint16_t rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
+	uint16_t rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
+	uint16_t rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
+	uint16_t cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
+	uint16_t cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
+	uint16_t emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
+	uint16_t fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+
+	// Save to EEPROM (compatible with MQTT layout: tank params after MQTT block)
+	// MQTT block: 0-192 (see: 0=flag, 1-64=server, 65-128=user, 129-192=pass)
+	// Tank params start at 193
+	const int tankParamBase = 193;
+	EEPROM.begin(512); // Use same size as MQTT
+	EEPROM.write(tankParamBase + 0, tankType);
+	EEPROM.put(tankParamBase + 1, rectWide);
+	EEPROM.put(tankParamBase + 3, rectDepth);
+	EEPROM.put(tankParamBase + 5, rectHeight);
+	EEPROM.put(tankParamBase + 7, cilDiameter);
+	EEPROM.put(tankParamBase + 9, cilHeight);
+	EEPROM.put(tankParamBase + 11, emptyTank);
+	EEPROM.put(tankParamBase + 13, fullTank);
+	EEPROM.commit();
+	EEPROM.end();
+
+	Serial.println("Tank parameters saved to EEPROM.");
 }

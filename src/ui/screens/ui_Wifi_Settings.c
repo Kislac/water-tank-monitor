@@ -41,42 +41,6 @@ void ui_Wifi_Settings_screen_init(void)
 
     lv_obj_set_style_arc_width(ui_Spinner4, 5, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    ui_imWifiConnected2 = lv_image_create(ui_TopInfoBar2);
-    lv_image_set_src(ui_imWifiConnected2, &ui_img_1628538605);
-    lv_obj_set_width(ui_imWifiConnected2, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imWifiConnected2, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_align(ui_imWifiConnected2, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imWifiConnected2, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imWifiConnected2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imWifiDisconnected2 = lv_image_create(ui_TopInfoBar2);
-    lv_image_set_src(ui_imWifiDisconnected2, &ui_img_1718934963);
-    lv_obj_set_width(ui_imWifiDisconnected2, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imWifiDisconnected2, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_align(ui_imWifiDisconnected2, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imWifiDisconnected2, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imWifiDisconnected2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imInternetOK2 = lv_image_create(ui_TopInfoBar2);
-    lv_image_set_src(ui_imInternetOK2, &ui_img_communicator_png);
-    lv_obj_set_width(ui_imInternetOK2, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imInternetOK2, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_x(ui_imInternetOK2, 20);
-    lv_obj_set_y(ui_imInternetOK2, 0);
-    lv_obj_set_align(ui_imInternetOK2, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imInternetOK2, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imInternetOK2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_imInternetNOK2 = lv_image_create(ui_TopInfoBar2);
-    lv_image_set_src(ui_imInternetNOK2, &ui_img_478874422);
-    lv_obj_set_width(ui_imInternetNOK2, LV_SIZE_CONTENT);   /// 20
-    lv_obj_set_height(ui_imInternetNOK2, LV_SIZE_CONTENT);    /// 20
-    lv_obj_set_x(ui_imInternetNOK2, 20);
-    lv_obj_set_y(ui_imInternetNOK2, 0);
-    lv_obj_set_align(ui_imInternetNOK2, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(ui_imInternetNOK2, LV_OBJ_FLAG_CLICKABLE);     /// Flags
-    lv_obj_remove_flag(ui_imInternetNOK2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
     ui_Container3 = lv_obj_create(ui_Wifi_Settings);
     lv_obj_remove_style_all(ui_Container3);
     lv_obj_set_width(ui_Container3, 318);

@@ -14,10 +14,9 @@ void ui_Main_Screen_screen_init(void);
 lv_obj_t * ui_Main_Screen;
 lv_obj_t * ui_TopInfoBar1;
 lv_obj_t * ui_Spinner2;
-lv_obj_t * ui_imWifiConnected4;
-lv_obj_t * ui_imWifiDisconnected4;
-lv_obj_t * ui_imInternetOK4;
-lv_obj_t * ui_imInternetNOK4;
+lv_obj_t * ui_imWifiInternetOK1;
+lv_obj_t * ui_imWifiDisconnected1;
+lv_obj_t * ui_imWifiConnectedNoInternet1;
 lv_obj_t * ui_lblDataNTime;
 lv_obj_t * ui_MainTabView;
 lv_obj_t * ui_Main;
@@ -53,6 +52,45 @@ void ui_event_Button1(lv_event_t * e);
 lv_obj_t * ui_Button1;
 lv_obj_t * ui_Label31;
 lv_obj_t * ui_Param;
+lv_obj_t * ui_ContTankType;
+lv_obj_t * ui_Label32;
+void ui_event_DropdownParamTankType(lv_event_t * e);
+lv_obj_t * ui_DropdownParamTankType;
+lv_obj_t * ui_ContRectangle;
+lv_obj_t * ui_lblWide;
+lv_obj_t * ui_lblDepth;
+lv_obj_t * ui_lblHeight;
+lv_obj_t * ui_Label35;
+void ui_event_TextAreaRectangleWide(lv_event_t * e);
+lv_obj_t * ui_TextAreaRectangleWide;
+void ui_event_TextAreaRectangleDepth(lv_event_t * e);
+lv_obj_t * ui_TextAreaRectangleDepth;
+void ui_event_TextAreaRectangleHeight(lv_event_t * e);
+lv_obj_t * ui_TextAreaRectangleHeight;
+lv_obj_t * ui_ContCilinder;
+lv_obj_t * ui_lblDiameter;
+lv_obj_t * ui_lblHeight1;
+lv_obj_t * ui_Label33;
+void ui_event_TextAreaCilinderDiameter(lv_event_t * e);
+lv_obj_t * ui_TextAreaCilinderDiameter;
+void ui_event_TextAreaCilinderHeight(lv_event_t * e);
+lv_obj_t * ui_TextAreaCilinderHeight;
+lv_obj_t * ui_ContMinMax;
+lv_obj_t * ui_lblDiameter1;
+lv_obj_t * ui_lblHeight2;
+lv_obj_t * ui_Label34;
+void ui_event_TextAreaEmptyTank(lv_event_t * e);
+lv_obj_t * ui_TextAreaEmptyTank;
+void ui_event_TextAreaFullTank(lv_event_t * e);
+lv_obj_t * ui_TextAreaFullTank;
+lv_obj_t * ui_ContButtons;
+lv_obj_t * ui_Button2;
+lv_obj_t * ui_Label36;
+void ui_event_Button3(lv_event_t * e);
+lv_obj_t * ui_Button3;
+lv_obj_t * ui_Label37;
+void ui_event_ParamKeyboard(lv_event_t * e);
+lv_obj_t * ui_ParamKeyboard;
 lv_obj_t * ui_Settings;
 lv_obj_t * ui_Container2;
 lv_obj_t * ui_lblWifiSwitch;
@@ -110,10 +148,6 @@ void ui_Wifi_Settings_screen_init(void);
 lv_obj_t * ui_Wifi_Settings;
 lv_obj_t * ui_TopInfoBar2;
 lv_obj_t * ui_Spinner4;
-lv_obj_t * ui_imWifiConnected2;
-lv_obj_t * ui_imWifiDisconnected2;
-lv_obj_t * ui_imInternetOK2;
-lv_obj_t * ui_imInternetNOK2;
 lv_obj_t * ui_Container3;
 lv_obj_t * ui_Container9;
 lv_obj_t * ui_Label4;
@@ -153,6 +187,8 @@ lv_obj_t * ui_Label28;
 // SCREEN: ui_WifiScanResult
 void ui_WifiScanResult_screen_init(void);
 lv_obj_t * ui_WifiScanResult;
+lv_obj_t * ui_TopInfoBar5;
+lv_obj_t * ui_Spinner6;
 lv_obj_t * ui_Container1;
 lv_obj_t * ui_Label1;
 void ui_event_funcWifiScan(lv_event_t * e);
@@ -172,10 +208,6 @@ void ui_ConnectToWifi_screen_init(void);
 lv_obj_t * ui_ConnectToWifi;
 lv_obj_t * ui_TopInfoBar3;
 lv_obj_t * ui_Spinner3;
-lv_obj_t * ui_imWifiConnected3;
-lv_obj_t * ui_imWifiDisconnected3;
-lv_obj_t * ui_imInternetOK3;
-lv_obj_t * ui_imInternetNOK3;
 void ui_event_Keyboard1(lv_event_t * e);
 lv_obj_t * ui_Keyboard1;
 lv_obj_t * ui_Container4;
@@ -211,10 +243,6 @@ void ui_MQTTSettings_screen_init(void);
 lv_obj_t * ui_MQTTSettings;
 lv_obj_t * ui_TopInfoBar;
 lv_obj_t * ui_Spinner1;
-lv_obj_t * ui_imWifiConnected1;
-lv_obj_t * ui_imWifiDisconnected1;
-lv_obj_t * ui_imInternetOK1;
-lv_obj_t * ui_imInternetNOK1;
 lv_obj_t * ui_ContMQTTServer;
 lv_obj_t * ui_lblMQTTlbl;
 void ui_event_TextAreaMQTTServer(lv_event_t * e);
@@ -236,8 +264,6 @@ lv_obj_t * ui_lblBack1;
 void ui_event_Forget(lv_event_t * e);
 lv_obj_t * ui_Forget;
 lv_obj_t * ui_lblBack2;
-lv_obj_t * ui_Connect;
-lv_obj_t * ui_lblBack3;
 void ui_event_KeyboardMQTT(lv_event_t * e);
 lv_obj_t * ui_KeyboardMQTT;
 lv_obj_t * ui____initial_actions0;
@@ -256,6 +282,100 @@ void ui_event_Button1(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         funcResetMinMaxDistance(e);
+    }
+}
+void ui_event_DropdownParamTankType(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        funcTankTypeChanged(e);
+    }
+}
+void ui_event_TextAreaRectangleWide(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaRectangleWide);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamRectangleWide(e);
+    }
+}
+void ui_event_TextAreaRectangleDepth(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaRectangleDepth);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamRectangleDepth(e);
+    }
+}
+void ui_event_TextAreaRectangleHeight(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaRectangleHeight);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamRectangleHeight(e);
+    }
+}
+void ui_event_TextAreaCilinderDiameter(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaCilinderDiameter);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamCilinderDiameter(e);
+    }
+}
+void ui_event_TextAreaCilinderHeight(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaCilinderHeight);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamCilinderHeight(e);
+    }
+}
+void ui_event_TextAreaEmptyTank(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaEmptyTank);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamEmptyTank(e);
+    }
+}
+void ui_event_TextAreaFullTank(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_keyboard_set_target(ui_ParamKeyboard,  ui_TextAreaFullTank);
+        _ui_flag_modify(ui_ParamKeyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        funcParamFullTank(e);
+    }
+}
+void ui_event_Button3(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        funcParamSave(e);
+    }
+}
+void ui_event_ParamKeyboard(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_READY) {
+        funcParamKeyboardOk(e);
     }
 }
 void ui_event_btnWifi(lv_event_t * e)

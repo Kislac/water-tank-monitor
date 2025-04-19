@@ -7,7 +7,7 @@
 #include <SPIFFS.h> // Include the SPIFFS library for Version handling
 #include <PubSubClient.h>
 #include <EEPROM.h>
-
+//#include <esp_heap_caps.h>
 
 //-------------------------------
 #include <Wire.h>
@@ -36,6 +36,10 @@ float temp_data[10] = {0};
 float hum_data[10] = {0};
 int data_index = 0;
 //------------------------
+
+
+bool vl53l1x_initialized = false;
+bool aht10_initialized = false;
 
 
 //Set the screen brightness to 50% initially
@@ -69,6 +73,17 @@ int global_minDistance = INT_MAX; // Initialize to maximum possible value
 int global_maxDistance = INT_MIN; // Initialize to minimum possible value
 
 int build_number = 0;
+
+uint8_t global_tankType = 0;
+uint16_t global_rectWide = 0;
+uint16_t global_rectDepth = 0;
+uint16_t global_rectHeight = 0;
+uint16_t global_cilDiameter = 0;
+uint16_t global_cilHeight = 0;
+uint16_t global_emptyTank = 0;
+uint16_t global_fullTank = 0;
+
+
 void initializeBuildInfo()
 {
   
@@ -101,58 +116,55 @@ void initializeBuildInfo()
 }
 
 
-lv_obj_t * wifiDisconnectedImages[4];
-lv_obj_t * wifiConnectedImages[4];
-lv_obj_t * internetOKImages[4];
-lv_obj_t * internetNOKImages[4];
+lv_obj_t * WifiInternetOKImages[1];
+lv_obj_t * WifiDisconnectedImages[1];
+lv_obj_t * WifiConnectedNoInternetImages[1];
 void initWifiSignalImages(){
-  wifiDisconnectedImages[0] = ui_imWifiDisconnected1;
-  wifiDisconnectedImages[1] = ui_imWifiDisconnected2;
-  wifiDisconnectedImages[2] = ui_imWifiDisconnected3;
-  wifiDisconnectedImages[3] = ui_imWifiDisconnected4;
-  wifiConnectedImages[0] = ui_imWifiConnected1;
-  wifiConnectedImages[1] = ui_imWifiConnected2;
-  wifiConnectedImages[2] = ui_imWifiConnected3;
-  wifiConnectedImages[3] = ui_imWifiConnected4;
-  internetOKImages[0] = ui_imInternetOK1;
-  internetOKImages[1] = ui_imInternetOK2;
-  internetOKImages[2] = ui_imInternetOK3;
-  internetOKImages[3] = ui_imInternetOK4;
-  internetNOKImages[0] = ui_imInternetNOK1;
-  internetNOKImages[1] = ui_imInternetNOK2;
-  internetNOKImages[2] = ui_imInternetNOK3;
-  internetNOKImages[3] = ui_imInternetNOK4;
+  WifiInternetOKImages[0] = ui_imWifiInternetOK1;
+  //WifiInternetOKImages[1] = ui_imWifiInternetOK2;
+  //WifiInternetOKImages[2] = ui_imWifiInternetOK3;
+  //WifiInternetOKImages[3] = ui_imWifiInternetOK4;
+  //WifiInternetOKImages[4] = ui_imWifiInternetOK5;
+  WifiDisconnectedImages[0] = ui_imWifiDisconnected1;
+  //WifiDisconnectedImages[1] = ui_imWifiDisconnected2;
+  //WifiDisconnectedImages[2] = ui_imWifiDisconnected3;
+  //WifiDisconnectedImages[3] = ui_imWifiDisconnected4;
+  //WifiDisconnectedImages[4] = ui_imWifiDisconnected5;
+  WifiConnectedNoInternetImages[0] = ui_imWifiConnectedNoInternet1;
+  //WifiConnectedNoInternetImages[1] = ui_imWifiConnectedNoInternet2;
+  //WifiConnectedNoInternetImages[2] = ui_imWifiConnectedNoInternet3;
+  //WifiConnectedNoInternetImages[3] = ui_imWifiConnectedNoInternet4;
+  //WifiConnectedNoInternetImages[4] = ui_imWifiConnectedNoInternet5;
 }
 
 
 // Függvény a képek láthatóságának frissítésére
 void updateStatusImages(bool internetOK) {
-    // WiFi Disconnected képek kezelése
+  // WiFi Disconnected képek kezelése
 
-    int wifiDisconnectedImagesCount = sizeof(wifiDisconnectedImages) / sizeof(wifiDisconnectedImages[0]);
-    //Serial.printf("wifiDisconnectedImages has %d elements\n", wifiDisconnectedImagesCount);
-    for (int i = 0; i < wifiDisconnectedImagesCount; i++) {
-      if (wifiDisconnectedImages[i] == nullptr) {
-        Serial.printf("wifiDisconnectedImages[%d] is nullptr\n", i);
-      } else {
-        //lv_obj_t* img = wifiDisconnectedImages[i];
-        //if (img != nullptr) { // Ensure the pointer is not null
-            if (wifiConnected) {
-                lv_obj_add_flag(wifiDisconnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
-                lv_obj_clear_flag(wifiConnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
-            } else {
-                lv_obj_clear_flag(wifiDisconnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
-                lv_obj_add_flag(wifiConnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
-            }
-            if (internetOK) {
-              lv_obj_add_flag(internetNOKImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
-              lv_obj_clear_flag(internetOKImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
-            } else {
-                lv_obj_clear_flag(internetNOKImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
-                lv_obj_add_flag(internetOKImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
-            }
-      }
+  int wifiDisconnectedImagesCount = sizeof(WifiInternetOKImages) / sizeof(WifiInternetOKImages[0]);
+  //Serial.printf("wifiDisconnectedImages has %d elements\n", wifiDisconnectedImagesCount);
+  for (int i = 0; i < wifiDisconnectedImagesCount; i++) {
+    if (WifiInternetOKImages[i] == nullptr) {
+      Serial.printf("wifiDisconnectedImages[%d] is nullptr\n", i);
+    } else {
+      //lv_obj_t* img = wifiDisconnectedImages[i];
+      //if (img != nullptr) { // Ensure the pointer is not null
+          if (wifiConnected && internetOK) {
+              lv_obj_add_flag(WifiDisconnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+              lv_obj_add_flag(WifiConnectedNoInternetImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+              lv_obj_clear_flag(WifiInternetOKImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
+          } else if (wifiConnected && !internetOK) {
+              lv_obj_add_flag(WifiDisconnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+              lv_obj_clear_flag(WifiConnectedNoInternetImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
+              lv_obj_add_flag(WifiInternetOKImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+          } else if (!wifiConnected){
+              lv_obj_clear_flag(WifiDisconnectedImages[i], LV_OBJ_FLAG_HIDDEN); // Megjelenítés
+              lv_obj_add_flag(WifiConnectedNoInternetImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+              lv_obj_add_flag(WifiInternetOKImages[i], LV_OBJ_FLAG_HIDDEN); // Elrejtés
+          }  
     }
+  }
 
 }
 
@@ -253,7 +265,7 @@ static ulong last_time_update = 0;
 static time_t current_time = 0; // Store the current time in seconds since epoch
 //static int timezone_offset = 3600; // Default timezone offset in seconds (CET)
 
-if (internetOK && (millis() - last_ntp_sync >= 60000 || current_time < 946684800)) { // Sync with NTP every 60 seconds or before year 2000
+if (internetOK && (millis() - last_ntp_sync >= 60000*5 || current_time < 946684800)) { // Sync with NTP every 60 seconds or before year 2000
   configTzTime("CET-1CEST,M3.5.0/2,M10.5.0/3", "pool.ntp.org", "time.nist.gov"); // Configure NTP servers
   struct tm timeinfo;
   if (getLocalTime(&timeinfo)) {
@@ -507,7 +519,7 @@ void ReadMQTTSettingsFromEEPROM(){
     Serial.println("No MQTT configuration found in EEPROM.");
   }
 
-  EEPROM.end();
+  //EEPROM.end();
 }
 
 
@@ -579,7 +591,13 @@ void ReadAHT10()
     lastReadTime = currentTime;
 
     sensors_event_t humidity, temp;
-    aht.getEvent(&humidity, &temp);  // Get the temperature and humidity event data
+
+
+    if (!aht.getEvent(&humidity, &temp)) {
+      Serial.println("AHT10 sensor not responding. Disabling sensor.");
+      aht10_initialized = false; // Szenzor letiltása
+      return;
+    }
     Temperature_Value = temp.temperature;
     Huminidity_Value = humidity.relative_humidity;
 //    // Store the data in the arrays
@@ -620,9 +638,9 @@ void DistanceSensorRead() {
       std::string status = VL53L1X::rangeStatusToString(sensor.ranging_data.range_status); // Use std::string
       sprintf(text_buffer, "%s", status.c_str()); // Convert std::string to C-string
       Serial.printf("Distance: %d mm, Status: %s\n", distance, status.c_str());
-      if (status != "range valid" || distance <= 0 || distance > 4500) {
+      if (status != "range valid" || distance <= 1 || distance > 4500) {
         Serial.println("Distance out of range or invalid status. Ignoring measurement.");
-        distance = 0;
+        //distance = 0;
       }
       
 
@@ -728,6 +746,106 @@ void DistanceSensorRead() {
   }
 }
 
+void ReinitializeVL53L1X() {
+  static ulong lastReinitTime = 0;
+  ulong currentTime = millis();
+
+  if (!vl53l1x_initialized && (currentTime - lastReinitTime >= 5000)) {
+      lastReinitTime = currentTime;
+      sprintf(text_buffer, "N/A");
+      lv_label_set_text(ui_lblActualDistanceValue, text_buffer);
+      lv_label_set_text(ui_lblCurrentLiter, text_buffer);
+      Serial.println("Attempting to reinitialize VL53L1X sensor...");
+      if (sensor.init()) {
+          Serial.println("VL53L1X sensor reinitialized successfully!");
+          vl53l1x_initialized = true;
+          sensor.setDistanceMode(VL53L1X::Long);
+          sensor.setMeasurementTimingBudget(500000);
+          sensor.startContinuous(500);
+      } else {
+          Serial.println("VL53L1X sensor reinitialization failed.");
+      }
+  }
+}
+
+void ReinitializeAHT10() {
+  static ulong lastReinitTime = 0;
+  ulong currentTime = millis();
+
+  if (!aht10_initialized && (currentTime - lastReinitTime >= 5000)) {
+      lastReinitTime = currentTime;
+      sprintf(text_buffer, "N/A");
+      lv_label_set_text(ui_lblTempValue, text_buffer);
+      lv_label_set_text(ui_lblHumValue, text_buffer);
+      Serial.println("Attempting to reinitialize AHT10 sensor...");
+      if (aht.begin(&I2C_VL53L1X)) {
+          Serial.println("AHT10 sensor reinitialized successfully!");
+          aht10_initialized = true;
+      } else {
+          Serial.println("AHT10 sensor reinitialization failed.");
+      }
+  }
+}
+
+void printHeapStatus() {
+  Serial.printf("Total heap: %d bytes\n", heap_caps_get_total_size(MALLOC_CAP_8BIT));
+  Serial.printf("Free heap: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+  Serial.printf("Largest free block: %d bytes\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+  Serial.printf("Minimum free heap ever: %d bytes\n", heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT));
+}
+
+
+
+void ReadTankParamsFromEEPROM() {
+  // Tank params start at 193
+  const int tankParamBase = 193;
+  EEPROM.begin(512);
+
+  uint8_t tankType = EEPROM.read(tankParamBase + 0);
+  uint16_t rectWide, rectDepth, rectHeight, cilDiameter, cilHeight, emptyTank, fullTank;
+  EEPROM.get(tankParamBase + 1, rectWide);
+  EEPROM.get(tankParamBase + 3, rectDepth);
+  EEPROM.get(tankParamBase + 5, rectHeight);
+  EEPROM.get(tankParamBase + 7, cilDiameter);
+  EEPROM.get(tankParamBase + 9, cilHeight);
+  EEPROM.get(tankParamBase + 11, emptyTank);
+  EEPROM.get(tankParamBase + 13, fullTank);
+
+  // Set global variables if you have them (example names)
+  global_tankType = tankType;
+  global_rectWide = rectWide;
+  global_rectDepth = rectDepth;
+  global_rectHeight = rectHeight;
+  global_cilDiameter = cilDiameter;
+  global_cilHeight = cilHeight;
+  global_emptyTank = emptyTank;
+  global_fullTank = fullTank;
+
+  // Update UI elements
+  lv_dropdown_set_selected(ui_DropdownParamTankType, tankType);
+
+  char buf[8];
+  snprintf(buf, sizeof(buf), "%u", rectWide);
+  lv_textarea_set_text(ui_TextAreaRectangleWide, buf);
+  snprintf(buf, sizeof(buf), "%u", rectDepth);
+  lv_textarea_set_text(ui_TextAreaRectangleDepth, buf);
+  snprintf(buf, sizeof(buf), "%u", rectHeight);
+  lv_textarea_set_text(ui_TextAreaRectangleHeight, buf);
+  snprintf(buf, sizeof(buf), "%u", cilDiameter);
+  lv_textarea_set_text(ui_TextAreaCilinderDiameter, buf);
+  snprintf(buf, sizeof(buf), "%u", cilHeight);
+  lv_textarea_set_text(ui_TextAreaCilinderHeight, buf);
+  snprintf(buf, sizeof(buf), "%u", emptyTank);
+  lv_textarea_set_text(ui_TextAreaEmptyTank, buf);
+  snprintf(buf, sizeof(buf), "%u", fullTank);
+  lv_textarea_set_text(ui_TextAreaFullTank, buf);
+
+  EEPROM.end();
+
+  Serial.println("Tank parameters loaded from EEPROM.");
+}
+
+
 void setup() {
   Serial.begin(115200);
 
@@ -738,28 +856,32 @@ void setup() {
   sensor.setBus(&I2C_VL53L1X);  // Set the I2C bus for VL53L1X
   sensor.setTimeout(1000);
   if (!sensor.init()) {
-      Serial.println("Failed to detect and initialize sensor!");
-  } else {
-      Serial.println("Sensor initialized successfully!");
-  }
-
+    Serial.println("Failed to detect and initialize sensor!");
+} else {
+  Serial.println("VL53L1X sensor initialized successfully!");
+  vl53l1x_initialized = true;
   sensor.setDistanceMode(VL53L1X::Long);
   sensor.setMeasurementTimingBudget(500000);
-  sensor.startContinuous(500);  
+  sensor.startContinuous(500);
+}
+
+
 
   // Initialize the AHT10 sensor on the custom I2C bus
   if (!aht.begin(&I2C_VL53L1X)) {
     Serial.println("AHT10 initialization failed.");
   } else {
     Serial.println("AHT10 sensor initialized.");
+    aht10_initialized = true;
   }
 
   smartdisplay_init();
-
+  Serial.println("smartdisplay_init() initialized.");
   __attribute__((unused)) auto disp = lv_disp_get_default();
    lv_disp_set_rotation(disp, LV_DISPLAY_ROTATION_90);
   // lv_disp_set_rotation(disp, LV_DISP_ROT_180);
   // lv_disp_set_rotation(disp, LV_DISP_ROT_270);
+  Serial.println("Starting ui_init()...");
   ui_init();
 
   Serial.println("Starting the program...");
@@ -771,14 +893,16 @@ void setup() {
   sprintf(text_buffer, "%d%%", SCREEN_INITIAL_BRIGHTNESS);
   lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
 
-  // Set the switch to manual mode initially
-  lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_DEFAULT);
+  // Set the switch to automatic mode initially LV_STATE_CHECKED
+  lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_CHECKED); //automatic mode
+  //lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_DEFAULT); //manual mode
 
 
 
   //wifi
   WiFi.mode(WIFI_STA);
   WiFi.begin();
+  WiFi.setSleep(true);  // Engedélyezd a WiFi energiatakarékos módját
   // Init the Wifi Signal images. Important to init after ui_init()
   initWifiSignalImages();
   initVariables();
@@ -786,22 +910,41 @@ void setup() {
 
   initializeBuildInfo();
   ReadMQTTSettingsFromEEPROM();
+  ReadTankParamsFromEEPROM();
 
+  Serial.begin(115200);
 
+  if (psramFound()) {
+      Serial.println("PSRAM is available!");
+      Serial.printf("Total PSRAM: %d bytes\n", ESP.getPsramSize());
+      Serial.printf("Free PSRAM: %d bytes\n", ESP.getFreePsram());
+  } else {
+      Serial.println("PSRAM is NOT available.");
+  }
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
+    static ulong lastHeapPrint = 0;
+//    if (now - lastHeapPrint >= 2000) {
+//      lastHeapPrint = now;
+//      printHeapStatus();
+//      lv_mem_monitor_t mem_mon;
+//      lv_mem_monitor(&mem_mon);
+//      printf("Total: %d bytes, Free: %d bytes, Largest Free: %d bytes\n",
+//        (int)mem_mon.total_size, (int)mem_mon.free_size, (int)mem_mon.free_biggest_size);
+//    }
+
     runtimecalc();
     AutoBacklight();
     RefreshWifiParameters();
     DateAndTimeHandling();
     CheckWifiandInternetStatus();
 
-    ReadAHT10();
-    //DistanceSensorRead();
+    aht10_initialized ? ReadAHT10() : ReinitializeAHT10();
+    vl53l1x_initialized ? DistanceSensorRead() : ReinitializeVL53L1X();
 
     if (!client.connected()) MQTT_setup();
       client.loop();
