@@ -134,13 +134,23 @@ void ui_Main_Screen_screen_init(void)
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
     if(lv_obj_get_style_pad_top(ui_BarCurrentState, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_BarCurrentState,
                                                                                                       lv_obj_get_style_pad_right(ui_BarCurrentState, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    ui_lblCurrentLiter1 = lv_label_create(ui_BarCurrentState);
+    lv_obj_set_width(ui_lblCurrentLiter1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblCurrentLiter1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_lblCurrentLiter1, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblCurrentLiter1, "?%");
+    ui_object_set_themeable_style_property(ui_lblCurrentLiter1, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+                                           _ui_theme_color_FontColor);
+    ui_object_set_themeable_style_property(ui_lblCurrentLiter1, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+                                           _ui_theme_alpha_FontColor);
+
     ui_lblMaxValue = lv_label_create(ui_Main);
     lv_obj_set_width(ui_lblMaxValue, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblMaxValue, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_lblMaxValue, 64);
     lv_obj_set_y(ui_lblMaxValue, -51);
     lv_obj_set_align(ui_lblMaxValue, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblMaxValue, "4500 l");
+    lv_label_set_text(ui_lblMaxValue, "4500");
     ui_object_set_themeable_style_property(ui_lblMaxValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblMaxValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
@@ -188,7 +198,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_x(ui_lblCurrentLiter, -39);
     lv_obj_set_y(ui_lblCurrentLiter, -48);
     lv_obj_set_align(ui_lblCurrentLiter, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblCurrentLiter, "1555l");
+    lv_label_set_text(ui_lblCurrentLiter, "1555");
     ui_object_set_themeable_style_property(ui_lblCurrentLiter, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblCurrentLiter, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,

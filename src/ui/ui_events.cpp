@@ -436,19 +436,28 @@ void funcParamSave(lv_event_t * e)
 	Serial.println("Tank parameters saved to EEPROM.");
 
 	
-	// Call CalcMaxTanklevel from main.cpp to recalculate tank level
-	if (global_tankType == 0) { // Cilinder
-		// Volume = π * r^2 * h
-		float radius = global_cilDiameter / 2.0f; // mm
-		float volume_mm3 = 3.14159265f * radius * radius * global_cilHeight;
-		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
-	} else if (global_tankType == 1) { // Rectangle
-		// Volume = width * depth * height
-		float volume_mm3 = global_rectWide * global_rectDepth * global_rectHeight;
-		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
-	}
+	// Calculate global_MaxTankLevel in liters (dm^3)
+  float radius;
+  float height;
+  float width;
+  float depth;
+  //float height;
+  if (global_tankType == 0) { // Cilinder
+    // Volume = π * r^2 * h
+    radius = global_cilDiameter / 200.0f; // Convert mm to dm
+    height = global_cilHeight / 100.0f; // Convert mm to dm
+    global_MaxTankLevel = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
+  } else if (global_tankType == 1) { // Rectangle
+    // Volume = width * depth * height
+    width = global_rectWide / 100.0f; // Convert mm to dm
+    depth = global_rectDepth / 100.0f; // Convert mm to dm
+    height = global_rectHeight / 100.0f; // Convert mm to dm
+    global_MaxTankLevel = width * depth * height; // Volume in liters (dm^3)
+  }
+  
 	char text_buffer[32];
-	sprintf(text_buffer, "%u L", (unsigned int)global_MaxTankLevel);
+	// Update the UI label with the calculated maximum tank level
+	sprintf(text_buffer, "%u L", global_MaxTankLevel);
 	lv_label_set_text(ui_lblMaxValue, text_buffer);
 	// Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
 	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);

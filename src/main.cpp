@@ -82,8 +82,10 @@ uint16_t global_cilDiameter = 0;
 uint16_t global_cilHeight = 0;
 uint16_t global_emptyTank = 0;
 uint16_t global_fullTank = 0;
-uint16_t global_MaxTankLevel = 0;
+float global_MaxTankLevel = 0;
+float global_tankVolume = 0.0f;
 
+int distance = 0;
 
 void initializeBuildInfo()
 {
@@ -623,6 +625,47 @@ void ReadAHT10()
   }
 }
 
+void ReadTankLevelinLiters() {
+  // Calculate global_MaxTankLevel in liters (dm^3)
+  int CurrentLiter;
+	if (global_tankType == 0) { // Cilinder
+		// Volume = π * r^2 * h
+		float radius = global_cilDiameter / 200.0f; // mm
+    float volume_dm3 = 3.14159265f * (radius / 100.0f) * (radius / 100.0f) * ((global_fullTank / 100.0f) - (distance / 100.0f));
+    
+  } else if (global_tankType == 1) { // Rectangle
+		// Volume = width * depth * height
+		float volume_dm3 = global_rectWide/100 * global_rectDepth * (global_fullTank-distance);
+	}
+  CurrentLiter = static_cast<int>(volume_dm3);
+  float CurrentLiterInPer = CurrentLiter /  global_MaxTankLevel;
+  // Print all relevant variables for debugging
+  //Serial.println("Debugging Variables:");
+  //Serial.printf("global_tankType: %u\n", global_tankType);
+  //Serial.printf("global_rectWide: %u\n", global_rectWide);
+  //Serial.printf("global_rectDepth: %u\n", global_rectDepth);
+  //Serial.printf("global_rectHeight: %u\n", global_rectHeight);
+  //Serial.printf("global_cilDiameter: %u\n", global_cilDiameter);
+  //Serial.printf("global_cilHeight: %u\n", global_cilHeight);
+  //Serial.printf("global_emptyTank: %u\n", global_emptyTank);
+  //Serial.printf("global_fullTank: %u\n", global_fullTank);
+  //Serial.printf("global_MaxTankLevel: %.2f\n", global_MaxTankLevel);
+  //Serial.printf("distance: %d\n", distance);
+  //Serial.printf("CurrentLiter: %d\n", CurrentLiter);
+  //Serial.printf("CurrentLiterInPer: %.2f\n", CurrentLiterInPer);
+  // Update the UI label with the calculated maximum tank level
+  sprintf(text_buffer, "%u L", CurrentLiter);
+  lv_label_set_text(ui_lblCurrentLiter, text_buffer);
+
+  sprintf(text_buffer, "%.2f %%", CurrentLiterInPer);
+  lv_label_set_text(ui_lblCurrentLiter1, text_buffer);
+
+  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
+	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
+}
+
+
+
 void DistanceSensorRead() {
   static ulong lastUSSReadTime = 0;
   ulong currentUSSTime = millis();
@@ -635,7 +678,7 @@ void DistanceSensorRead() {
       //  sprintf(text_buffer, "Out of range");
       //} else {
       //  
-      int distance = sensor.ranging_data.range_mm; // Corrected missing semicolon
+      distance = sensor.ranging_data.range_mm; // Corrected missing semicolon
       std::string status = VL53L1X::rangeStatusToString(sensor.ranging_data.range_status); // Use std::string
       sprintf(text_buffer, "%s", status.c_str()); // Convert std::string to C-string
       Serial.printf("Distance: %d mm, Status: %s\n", distance, status.c_str());
@@ -743,30 +786,11 @@ void DistanceSensorRead() {
         sprintf(text_buffer, "%d mm", global_maxDistance);
         lv_label_set_text(ui_lblMaxDistanceValue, text_buffer);
       }
-
+      ReadTankLevelinLiters();
   }
 }
 
-void ReadTankLevelinLiters() {
-//  static ulong lastTankLevelReadTime = 0;
-//  ulong currentTankLevelTime = millis();
-//
-//  if (currentTankLevelTime - lastTankLevelReadTime >= 1000) {
-//    lastTankLevelReadTime = currentTankLevelTime;
-//
-//    // Calculate the tank level based on the distance
-//    int tankLevel = global_fullTank - sensor.ranging_data.range_mm; // Assuming full tank is at 0 mm distance
-//
-//    if (tankLevel < 0) {
-//      tankLevel = 0; // Tank is empty
-//    } else if (tankLevel > global_fullTank) {
-//      tankLevel = global_fullTank; // Tank is full
-//    }
-//
-//    sprintf(text_buffer, "%d L", tankLevel);
-//    lv_label_set_text(ui_lblCurrentLiter, text_buffer);
-//  }
-}
+
 
 void ReinitializeVL53L1X() {
   static ulong lastReinitTime = 0;
@@ -816,7 +840,48 @@ void printHeapStatus() {
   Serial.printf("Minimum free heap ever: %d bytes\n", heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT));
 }
 
-
+void CalcMaxTanklevel() {
+  // Calculate global_MaxTankLevel in liters (dm^3)
+  float radius;
+  float height;
+  float width;
+  float depth;
+  //float height;
+  if (global_tankType == 0) { // Cilinder
+    // Volume = π * r^2 * h
+    radius = global_cilDiameter / 200.0f; // Convert mm to dm
+    height = global_cilHeight / 100.0f; // Convert mm to dm
+    global_MaxTankLevel = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
+  } else if (global_tankType == 1) { // Rectangle
+    // Volume = width * depth * height
+    width = global_rectWide / 100.0f; // Convert mm to dm
+    depth = global_rectDepth / 100.0f; // Convert mm to dm
+    height = global_rectHeight / 100.0f; // Convert mm to dm
+    global_MaxTankLevel = width * depth * height; // Volume in liters (dm^3)
+  }
+  Serial.println("Calculating Max Tank Level...");
+  Serial.printf("Width (dm): %.2f\n", width);
+  Serial.printf("Depth (dm): %.2f\n", depth);
+  Serial.printf("Height (dm): %.2f\n", height);
+  Serial.printf("Calculated Volume (liters): %.2f\n", global_MaxTankLevel);
+  // Update the UI label with the calculated maximum tank level
+  sprintf(text_buffer, "%d L", (int)global_MaxTankLevel);
+  lv_label_set_text(ui_lblMaxValue, text_buffer);
+  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
+	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
+  
+  // Debugging all variables within CalcMaxTanklevel
+  Serial.println("Debugging Variables in CalcMaxTanklevel:");
+  Serial.printf("global_tankType: %u\n", global_tankType);
+  Serial.printf("global_rectWide: %u\n", global_rectWide);
+  Serial.printf("global_rectDepth: %u\n", global_rectDepth);
+  Serial.printf("global_rectHeight: %u\n", global_rectHeight);
+  Serial.printf("global_cilDiameter: %u\n", global_cilDiameter);
+  Serial.printf("global_cilHeight: %u\n", global_cilHeight);
+  Serial.printf("global_emptyTank: %u\n", global_emptyTank);
+  Serial.printf("global_fullTank: %u\n", global_fullTank);
+  Serial.printf("global_MaxTankLevel: %.2f\n", global_MaxTankLevel);
+}
 
 void ReadTankParamsFromEEPROM() {
   // Tank params start at 193
@@ -877,26 +942,11 @@ void ReadTankParamsFromEEPROM() {
 
   // Call funcTankTypeChanged to update UI containers
   funcTankTypeChanged(nullptr);
+  CalcMaxTanklevel();
+
 }
 
-void CalcMaxTanklevel() {
-  // Calculate global_MaxTankLevel in liters (dm^3)
-	if (global_tankType == 0) { // Cilinder
-		// Volume = π * r^2 * h
-		float radius = global_cilDiameter / 2.0f; // mm
-		float volume_mm3 = 3.14159265f * radius * radius * global_cilHeight;
-		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
-	} else if (global_tankType == 1) { // Rectangle
-		// Volume = width * depth * height
-		float volume_mm3 = global_rectWide * global_rectDepth * global_rectHeight;
-		global_MaxTankLevel = volume_mm3 / 1000000.0f; // mm^3 to liters (dm^3)
-	}
-  // Update the UI label with the calculated maximum tank level
-  sprintf(text_buffer, "%u L", global_MaxTankLevel);
-  lv_label_set_text(ui_lblMaxValue, text_buffer);
-  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
-	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
-}
+
 
 
 
@@ -965,7 +1015,7 @@ void setup() {
   initializeBuildInfo();
   ReadMQTTSettingsFromEEPROM();
   ReadTankParamsFromEEPROM();
-  CalcMaxTanklevel();
+  //CalcMaxTanklevel();
 
 
   Serial.begin(115200);

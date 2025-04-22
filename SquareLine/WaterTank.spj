@@ -19647,7 +19647,7 @@
                           {
                             "disabled": false,
                             "nid": -1728798627,
-                            "strtype": "BUTTON/EventHandler",
+                            "strtype": "_event/EventHandler",
                             "strval": "CLICKED",
                             "childs": [
                               {
@@ -63622,9 +63622,9 @@
     "theme_dark": false,
     "theme_color1": 5,
     "theme_color2": 0,
-    "uiExportFolderPath": "D:\\GIT\\water-tank-monitor\\src\\ui",
-    "projectExportFolderPath": "D:\\GIT\\water-tank-monitor",
-    "backup_cnt": 457,
+    "uiExportFolderPath": "C:\\04_Offwork\\Github\\water-tank-monitor\\src\\ui",
+    "projectExportFolderPath": "C:\\04_Offwork\\Github\\water-tank-monitor",
+    "backup_cnt": 469,
     "autosave_cnt": 0,
     "lvgl_version": "9.1.0",
     "callfuncsexport": "CPP_FILE",

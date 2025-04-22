@@ -22,5 +22,6 @@ extern uint16_t global_cilDiameter;
 extern uint16_t global_cilHeight;
 extern uint16_t global_emptyTank;
 extern uint16_t global_fullTank;
-extern uint16_t global_MaxTankLevel;
+extern float global_MaxTankLevel;
+extern float global_tankVolume;
 #endif // GLOBALS_H

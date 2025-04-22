@@ -29,6 +29,7 @@ extern lv_obj_t * ui_lblDataNTime;
 extern lv_obj_t * ui_MainTabView;
 extern lv_obj_t * ui_Main;
 extern lv_obj_t * ui_BarCurrentState;
+extern lv_obj_t * ui_lblCurrentLiter1;
 extern lv_obj_t * ui_lblMaxValue;
 extern lv_obj_t * ui_lblMinValue;
 extern lv_obj_t * ui_lblMax;

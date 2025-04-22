@@ -21,6 +21,7 @@ lv_obj_t * ui_lblDataNTime;
 lv_obj_t * ui_MainTabView;
 lv_obj_t * ui_Main;
 lv_obj_t * ui_BarCurrentState;
+lv_obj_t * ui_lblCurrentLiter1;
 lv_obj_t * ui_lblMaxValue;
 lv_obj_t * ui_lblMinValue;
 lv_obj_t * ui_lblMax;

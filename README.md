@@ -104,3 +104,8 @@ T568B kiosztás:
 6. Zöld             --> SCA
 7. Barna/Fehér      --> Üres
 8. Barna            --> Üres
+
+
+C:\Users\ikl2bp\.platformio\packages\framework-arduinoespressif32\tools\sdk\esp32\ld\memory.ld:
+dram0_0_seg (RW) : org = 0x3FFB0000 + 0xdb5c,
+                                                    len = 0x30000 - 0xdb5c
