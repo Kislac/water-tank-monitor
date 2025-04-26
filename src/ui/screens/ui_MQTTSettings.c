@@ -41,6 +41,10 @@ void ui_MQTTSettings_screen_init(void)
     lv_obj_set_style_border_color(ui_ContMQTTServer, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_ContMQTTServer, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_ContMQTTServer, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_ContMQTTServer, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ContMQTTServer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_ContMQTTServer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_ContMQTTServer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_lblMQTTlbl = lv_label_create(ui_ContMQTTServer);
     lv_obj_set_width(ui_lblMQTTlbl, LV_SIZE_CONTENT);   /// 1
@@ -75,6 +79,10 @@ void ui_MQTTSettings_screen_init(void)
     lv_obj_set_style_border_color(ui_ContMQTTUser, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_ContMQTTUser, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_ContMQTTUser, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_ContMQTTUser, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ContMQTTUser, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_ContMQTTUser, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_ContMQTTUser, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_lblMQTTuser = lv_label_create(ui_ContMQTTUser);
     lv_obj_set_width(ui_lblMQTTuser, LV_SIZE_CONTENT);   /// 1
@@ -107,6 +115,10 @@ void ui_MQTTSettings_screen_init(void)
     lv_obj_set_style_border_color(ui_ContMQTTPassword, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_ContMQTTPassword, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_ContMQTTPassword, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_ContMQTTPassword, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ContMQTTPassword, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_ContMQTTPassword, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_ContMQTTPassword, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_lblMQTTPassword = lv_label_create(ui_ContMQTTPassword);
     lv_obj_set_width(ui_lblMQTTPassword, LV_SIZE_CONTENT);   /// 1
@@ -186,6 +198,7 @@ void ui_MQTTSettings_screen_init(void)
     lv_obj_add_event_cb(ui_Back, ui_event_Back, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Save, ui_event_Save, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Forget, ui_event_Forget, LV_EVENT_ALL, NULL);
+    lv_keyboard_set_textarea(ui_KeyboardMQTT, ui_TextAreaMQTTServer);
     lv_obj_add_event_cb(ui_KeyboardMQTT, ui_event_KeyboardMQTT, LV_EVENT_ALL, NULL);
 
 }

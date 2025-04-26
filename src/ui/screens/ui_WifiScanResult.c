@@ -110,7 +110,8 @@ void ui_WifiScanResult_screen_init(void)
     ui_Label3 = lv_label_create(ui_PanelWifiList);
     lv_obj_set_width(ui_Label3, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Label3, LV_SIZE_CONTENT);    /// 1
-    lv_label_set_text(ui_Label3, "Press the \"Scan Wifi\" Button to Scan\nConnect only 2,4gHz WiFi!");
+    lv_label_set_text(ui_Label3,
+                      "Press the \"Scan Wifi\" Button to Scan\nConnect only 2,4gHz WiFi!\n\n(Only closest 8 SSID listed for stability \nreason)");
 
     ui_panelScanningWifi = lv_obj_create(ui_WifiScanResult);
     lv_obj_set_width(ui_panelScanningWifi, 282);

@@ -9,6 +9,13 @@
 #include <EEPROM.h>
 //#include <esp_heap_caps.h>
 
+//include OTA
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <HTTPUpdate.h>
+
+
+
 //-------------------------------
 #include <Wire.h>
 #include <Adafruit_AHTX0.h>
@@ -36,7 +43,7 @@ float temp_data[10] = {0};
 float hum_data[10] = {0};
 int data_index = 0;
 //------------------------
-
+bool lvgl_enabled = true;
 
 bool vl53l1x_initialized = false;
 bool aht10_initialized = false;
@@ -82,10 +89,12 @@ uint16_t global_cilDiameter = 0;
 uint16_t global_cilHeight = 0;
 uint16_t global_emptyTank = 0;
 uint16_t global_fullTank = 0;
-float global_MaxTankLevel = 0;
+float global_MaxTankLevelInLiter = 0;
 float global_tankVolume = 0.0f;
 
 int distance = 0;
+int CurrentLiter;
+float CurrentLiterInPer;
 
 void initializeBuildInfo()
 {
@@ -207,6 +216,7 @@ void RefreshWifiParameters() {
     if (WiFi.status() == WL_CONNECTED) {
       // Refresh SSID
       lv_label_set_text(ui_lblWifiSSID, WiFi.SSID().c_str());
+      
 
       // Refresh IP address
       lv_label_set_text(ui_lblWifiIP, WiFi.localIP().toString().c_str());
@@ -215,6 +225,7 @@ void RefreshWifiParameters() {
       char rssi_text[16];
       snprintf(rssi_text, sizeof(rssi_text), "%d dBm", WiFi.RSSI());
       lv_label_set_text(ui_lblWifiRSSI, rssi_text);
+      lv_label_set_text(ui_lblWifiRSSI2, rssi_text);
 
       // Refresh Channel
       char channel_text[16];
@@ -228,6 +239,7 @@ void RefreshWifiParameters() {
         } else {
       // Clear labels if not connected
       lv_label_set_text(ui_lblWifiSSID, "N/A");
+      lv_label_set_text(ui_lblWifiRSSI2, "N/A");
       lv_label_set_text(ui_lblWifiIP, "N/A");
       lv_label_set_text(ui_lblWifiRSSI, "N/A");
       lv_label_set_text(ui_lblWifiChannel, "N/A");
@@ -305,6 +317,10 @@ void AutoBacklight(){
   static int last_slider_value = 0;
 
   if (millis() - last_AutoBacklight >= 100) { // Refresh every 100ms
+    // Debounced EEPROM save for slider value
+    static ulong last_slider_change_time = 0;
+    static bool slider_changed = false;
+
     last_AutoBacklight = millis();
     auto cdr = analogReadMilliVolts(CDS);
     sprintf(text_buffer, "%d", cdr);
@@ -325,11 +341,30 @@ void AutoBacklight(){
     int slider_value = lv_slider_get_value(ui_LigthSensorSlider);
     if (!(lv_obj_get_state(ui_switchManualAutomatic) & LV_STATE_CHECKED) && slider_value != last_slider_value) {
         // Read the slider value
-        last_slider_value = slider_value;
+        
+        
         //int slider_value = lv_slider_get_value(ui_LigthSensorSlider);
         float lcd_set_backlight = (float)slider_value / 100;
         Serial.printf("slider_value: %d | lcd_set_backlight: %.2f\n", slider_value, lcd_set_backlight);
         smartdisplay_lcd_set_backlight(max(lcd_set_backlight, 0.01f));
+
+        // Detect slider value change
+        if (slider_value != last_slider_value) {
+          last_slider_change_time = millis();
+          slider_changed = true;
+          last_slider_value = slider_value;
+        }
+
+
+    }
+    // Save to EEPROM if 3 seconds have passed since last change
+    if (slider_changed && (millis() - last_slider_change_time >= 3000)) {
+      EEPROM.begin(512);
+      EEPROM.write(301, slider_value); // Store slider value at address 301
+      EEPROM.commit();
+      EEPROM.end();
+      Serial.printf("Light sensor slider value saved (delayed): %d\n", slider_value);
+      slider_changed = false;
     }
 
   }
@@ -372,7 +407,7 @@ void publishDiscoveryMessages() {
     "}"
   "}", macAddress, macAddress, device_name, device_identifiers,device_manufacturer, device_model, device_sw_version);
   bool result_rssi = client.publish(rssi_discovery_topic, rssi_discovery_payload, false);
-  Serial.print("RSSI discovery publish result: ");
+  Serial.print("MQTT: RSSI discovery publish result: ");
   Serial.println(result_rssi ? "OK" : "FAILED");
 //  if (!result_rssi) {
 //    Serial.print("MQTT client state: ");
@@ -399,7 +434,7 @@ void publishDiscoveryMessages() {
     "}"
   "}", macAddress, macAddress, device_name, device_identifiers, device_manufacturer, device_model, device_sw_version);
   bool result_temp = client.publish(temp_discovery_topic, temp_discovery_payload, true);
-  Serial.print("Temperature discovery publish result: ");
+  Serial.print("MQTT: Temperature discovery publish result: ");
   Serial.println(result_temp ? "OK" : "FAILED");
 
   // Humidity discovery
@@ -422,7 +457,7 @@ void publishDiscoveryMessages() {
     "}"
   "}", macAddress, macAddress, device_name, device_identifiers, device_manufacturer, device_model, device_sw_version);
   bool result_hum = client.publish(hum_discovery_topic, hum_discovery_payload, true);
-  Serial.print("Humidity discovery publish result: ");
+  Serial.print("MQTT: Humidity discovery publish result: ");
   Serial.println(result_hum ? "OK" : "FAILED");
 
   // Distance discovery
@@ -445,21 +480,66 @@ void publishDiscoveryMessages() {
     "}"
   "}", macAddress, macAddress, device_name, device_identifiers, device_manufacturer, device_model, device_sw_version);
   bool result_dist = client.publish(distance_discovery_topic, distance_discovery_payload, true);
-  Serial.print("Distance discovery publish result: ");
+  Serial.print("MQTT: Distance discovery publish result: ");
   Serial.println(result_dist ? "OK" : "FAILED");
-  Serial.println("Discovery messages published.");
+
+  // Liter discovery
+  char liter_discovery_topic[128];
+  snprintf(liter_discovery_topic, sizeof(liter_discovery_topic), "homeassistant/sensor/%s_liter/config", macAddress);
+  char liter_discovery_payload[512];
+  snprintf(liter_discovery_payload, sizeof(liter_discovery_payload),
+  "{"
+    "\"name\":\"Liter\","
+    "\"uniq_id\":\"WTM_liter_%s\","
+    "\"state_topic\":\"WTM_%s/sensor/liter\","
+    "\"unit_of_measurement\":\"L\","
+    "\"device_class\":\"volume\","
+    "\"device\":{"
+      "\"name\":\"%s\","
+      "\"identifiers\":[\"%s\"],"
+      "\"manufacturer\":\"%s\","
+      "\"model\":\"%s\","
+      "\"sw_version\":\"%s\""
+    "}"
+  "}", macAddress, macAddress, device_name, device_identifiers, device_manufacturer, device_model, device_sw_version);
+  bool result_Liter = client.publish(liter_discovery_topic, liter_discovery_payload, true);
+  Serial.print("MQTT: Liter discovery publish result: ");
+  Serial.println(result_Liter ? "OK" : "FAILED");
+
+  // TankLevel discovery
+  char TankLevelPercentage_discovery_topic[128];
+  snprintf(TankLevelPercentage_discovery_topic, sizeof(TankLevelPercentage_discovery_topic), "homeassistant/sensor/%s_TankLevelpercentage/config", macAddress);
+  char TankLevelPercentage_discovery_payload[512];
+  snprintf(TankLevelPercentage_discovery_payload, sizeof(TankLevelPercentage_discovery_payload),
+  "{"
+    "\"name\":\"TankLevelTankLevel\","
+    "\"uniq_id\":\"WTM_TankLevelPercentage_%s\","
+    "\"state_topic\":\"WTM_%s/sensor/TankLevelpercentage\","
+    "\"unit_of_measurement\":\"%%\","
+    "\"device_class\":\"moisture\","
+    "\"device\":{"
+      "\"name\":\"%s\","
+      "\"identifiers\":[\"%s\"],"
+      "\"manufacturer\":\"%s\","
+      "\"model\":\"%s\","
+      "\"sw_version\":\"%s\""
+    "}"
+  "}", macAddress, macAddress, device_name, device_identifiers, device_manufacturer, device_model, device_sw_version);
+  bool result_TankLevelPercentage = client.publish(TankLevelPercentage_discovery_topic, TankLevelPercentage_discovery_payload, true);
+  Serial.print("TankLevelPercentage discovery publish result: ");
+  Serial.println(result_TankLevelPercentage ? "OK" : "FAILED");
 }
 
 bool MQTT_Connect() {
   if (client.connect("esp32_water_tank", global_mqtt_user, global_mqtt_password)) {
-    Serial.println("MQTT kapcsolat sikeres!");
+    Serial.println("MQTT: Connected to the MQTT server!");
     //client.subscribe("esp32/water"); Ez a fogadáshoz kell
 
     // Discovery topicok küldése
     publishDiscoveryMessages();
     return true;
   } else {
-    Serial.print("MQTT kapcsolat sikertelen, hiba kód: ");
+    Serial.print("MQTT: Not able to connect the MQTT server!, error code: ");
     Serial.println(client.state());
     return false;
   }
@@ -478,13 +558,12 @@ void MQTT_setup(){
         //Serial.println(mqtt_server);
     
         if (MQTT_Connect()) {
-          Serial.println("Kapcsolódás sikeres!");
           break;
         } else {
           
-            Serial.print("MQTT kapcsolat sikertelen, hiba kód: ");
-            Serial.print(client.state());
-            Serial.println(". Újrapróbálkozás 5 másodperc múlva...");
+            //Serial.print("MQTT: Not able to connect the MQTT server!, error code: ");
+            //Serial.print(client.state());
+            Serial.println(". retry after 5 sec...");
         }
       }
     }
@@ -557,6 +636,19 @@ void publishMQTTSensoraDatas() {
     snprintf(distanceStr, sizeof(distanceStr), "%d", sensor.ranging_data.range_mm);
     snprintf(topic, sizeof(topic), "WTM_%s/sensor/distance", macAddress);
     client.publish(topic, distanceStr, true);
+
+
+    // Publish Liter data
+    char literStr[10];
+    snprintf(literStr, sizeof(literStr), "%d", CurrentLiter);
+    snprintf(topic, sizeof(topic), "WTM_%s/sensor/liter", macAddress);
+    client.publish(topic, literStr, true);
+
+    // Publish Percentage data
+    char percentageStr[10];
+    snprintf(percentageStr, sizeof(percentageStr), "%.1f", CurrentLiterInPer);
+    snprintf(topic, sizeof(topic), "WTM_%s/sensor/TankLevelpercentage", macAddress);
+    client.publish(topic, percentageStr, true);
  }
 }
 
@@ -626,19 +718,23 @@ void ReadAHT10()
 }
 
 void ReadTankLevelinLiters() {
-  // Calculate global_MaxTankLevel in liters (dm^3)
-  int CurrentLiter;
+  // Calculate global_MaxTankLevelInLiter in liters (dm^3)
+  
+  float radius;
+  float volume_dm3;
 	if (global_tankType == 0) { // Cilinder
 		// Volume = π * r^2 * h
-		float radius = global_cilDiameter / 200.0f; // mm
-    float volume_dm3 = 3.14159265f * (radius / 100.0f) * (radius / 100.0f) * ((global_fullTank / 100.0f) - (distance / 100.0f));
-    
+		radius = global_cilDiameter / 200.0f; // mm
+    volume_dm3 = 3.14159265f * (radius / 100.0f) * (radius / 100.0f) * ((global_cilHeight / 100.0f)-(distance / 100.0f)+(global_fullTank / 100.0f));
   } else if (global_tankType == 1) { // Rectangle
 		// Volume = width * depth * height
-		float volume_dm3 = global_rectWide/100 * global_rectDepth * (global_fullTank-distance);
+		volume_dm3 = (global_rectWide/100.0f) * (global_rectDepth/ 100.0f) * ((global_rectHeight / 100.0f) - (distance/ 100.0f) + (global_fullTank/ 100.0f));
 	}
   CurrentLiter = static_cast<int>(volume_dm3);
-  float CurrentLiterInPer = CurrentLiter /  global_MaxTankLevel;
+  CurrentLiterInPer = CurrentLiter /  global_MaxTankLevelInLiter * 100.0f;
+  // Clamp CurrentLiterInPer between 0 and 100
+  if (CurrentLiterInPer < 0.0f) CurrentLiterInPer = 0.0f;
+  if (CurrentLiterInPer > 100.0f) CurrentLiterInPer = 100.0f;
   // Print all relevant variables for debugging
   //Serial.println("Debugging Variables:");
   //Serial.printf("global_tankType: %u\n", global_tankType);
@@ -649,22 +745,100 @@ void ReadTankLevelinLiters() {
   //Serial.printf("global_cilHeight: %u\n", global_cilHeight);
   //Serial.printf("global_emptyTank: %u\n", global_emptyTank);
   //Serial.printf("global_fullTank: %u\n", global_fullTank);
-  //Serial.printf("global_MaxTankLevel: %.2f\n", global_MaxTankLevel);
+  //Serial.printf("global_MaxTankLevelInLiter: %.2f\n", global_MaxTankLevelInLiter);
   //Serial.printf("distance: %d\n", distance);
   //Serial.printf("CurrentLiter: %d\n", CurrentLiter);
+  //Serial.printf("distance %.2f\n", distance);
   //Serial.printf("CurrentLiterInPer: %.2f\n", CurrentLiterInPer);
   // Update the UI label with the calculated maximum tank level
-  sprintf(text_buffer, "%u L", CurrentLiter);
+  sprintf(text_buffer, "%d L / %d L", CurrentLiter, (int)global_MaxTankLevelInLiter);
   lv_label_set_text(ui_lblCurrentLiter, text_buffer);
 
-  sprintf(text_buffer, "%.2f %%", CurrentLiterInPer);
+  sprintf(text_buffer, "%.0f %%", CurrentLiterInPer);
   lv_label_set_text(ui_lblCurrentLiter1, text_buffer);
 
-  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
-	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
+
+  // Update the UI bar with the current tank level
+  lv_bar_set_value(ui_BarCurrentState, CurrentLiter, LV_ANIM_ON);
+
 }
 
 
+
+void UpdateChartActualLiter() {
+  static ulong lastChartUpdate = 0;
+  static lv_chart_series_t *distance_series = nullptr;
+  static lv_coord_t liter_values[30] = {0}; // Store last 30 values
+  static bool initialized = false;
+
+  // Initialize the array with LV_CHART_POINT_NONE only once
+  if (!initialized) {
+    for (int i = 0; i < 30; ++i) {
+      liter_values[i] = LV_CHART_POINT_NONE;
+    }
+    initialized = true;
+  }
+
+  ulong now_ms = millis();
+  if (now_ms - lastChartUpdate >= 10000) { // 10 sec
+    lastChartUpdate = now_ms;
+
+
+    // Shift values left
+    for (int i = 0; i < 29; i++) {
+      liter_values[i] = liter_values[i + 1];
+    }
+    // Add current liter value
+    liter_values[29] = CurrentLiter;
+
+    // Setup chart series if not done
+    if (!distance_series) {
+      distance_series = lv_chart_add_series(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
+    }
+
+    lv_chart_set_point_count(ui_ChartActualLiter, 30);
+    lv_chart_set_ext_y_array(ui_ChartActualLiter, distance_series, liter_values);
+
+    lv_chart_refresh(ui_ChartActualLiter);
+  }
+}
+
+void UpdateChartActualLiterRightToLeft() {
+  static ulong lastChartUpdate = 0;
+  static lv_chart_series_t *distance_series = nullptr;
+  static lv_coord_t liter_values[30];
+  static bool initialized = false;
+
+  // Initialize the array with LV_CHART_POINT_NONE only once
+  if (!initialized) {
+    for (int i = 0; i < 30; ++i) {
+      liter_values[i] = LV_CHART_POINT_NONE;
+    }
+    initialized = true;
+  }
+
+  ulong now_ms = millis();
+  if (now_ms - lastChartUpdate >= 10000) { // 10 sec
+    lastChartUpdate = now_ms;
+
+    // Shift values right (jobbról balra frissítés)
+    for (int i = 29; i > 0; i--) {
+      liter_values[i] = liter_values[i - 1];
+    }
+    // Add current liter value to the leftmost position
+    liter_values[0] = CurrentLiter;
+
+    // Setup chart series if not done
+    if (!distance_series) {
+      distance_series = lv_chart_add_series(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
+    }
+
+    lv_chart_set_point_count(ui_ChartActualLiter, 30);
+    lv_chart_set_ext_y_array(ui_ChartActualLiter, distance_series, liter_values);
+
+    lv_chart_refresh(ui_ChartActualLiter);
+  }
+}
 
 void DistanceSensorRead() {
   static ulong lastUSSReadTime = 0;
@@ -682,7 +856,7 @@ void DistanceSensorRead() {
       std::string status = VL53L1X::rangeStatusToString(sensor.ranging_data.range_status); // Use std::string
       sprintf(text_buffer, "%s", status.c_str()); // Convert std::string to C-string
       Serial.printf("Distance: %d mm, Status: %s\n", distance, status.c_str());
-      if (status != "range valid" || distance <= 1 || distance > 4500) {
+      if (status != "range valid" || distance <= 1 || distance > 4000) {
         Serial.println("Distance out of range or invalid status. Ignoring measurement.");
         //distance = 0;
       }
@@ -696,21 +870,21 @@ void DistanceSensorRead() {
         //
         //lv_label_set_text(ui_lblDistanceStatus, text_buffer);
 
-        static int last8Distances[8] = {0}; // Array to store the last 8 distance values
-        // Shift the values to the left
-        for (int i = 0; i < 7; i++) {
-            last8Distances[i] = last8Distances[i + 1];
-        }
-        // Add the new distance value to the end
-        last8Distances[7] = distance;
-
-        // Format the last 8 distances into the text buffer
-        snprintf(text_buffer, sizeof(text_buffer), 
-            "%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm",
-            last8Distances[0], last8Distances[1], last8Distances[2], last8Distances[3],
-            last8Distances[4], last8Distances[5], last8Distances[6], last8Distances[7]);
-
-        //lv_label_set_text(ui_lblLast8Distance, text_buffer);
+//        static int last8Distances[8] = {0}; // Array to store the last 8 distance values
+//        // Shift the values to the left
+//        for (int i = 0; i < 7; i++) {
+//            last8Distances[i] = last8Distances[i + 1];
+//        }
+//        // Add the new distance value to the end
+//        last8Distances[7] = distance;
+//
+//        // Format the last 8 distances into the text buffer
+//        snprintf(text_buffer, sizeof(text_buffer), 
+//            "%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm",
+//            last8Distances[0], last8Distances[1], last8Distances[2], last8Distances[3],
+//            last8Distances[4], last8Distances[5], last8Distances[6], last8Distances[7]);
+//
+//        //lv_label_set_text(ui_lblLast8Distance, text_buffer);
 
 
         static lv_coord_t distance_values[30] = {0}; // Array to store the last 50 distance values
@@ -724,6 +898,7 @@ void DistanceSensorRead() {
         distance_values[29] = distance;
 
         // Update the chart with the new values
+        
 //        lv_chart_set_point_count(ui_ChartActualDistance, 30); // Ensure the chart has 50 points
 //        static lv_chart_series_t *ui_ChartActualDistance_series = nullptr;
 //        if (ui_ChartActualDistance_series == nullptr) {
@@ -786,7 +961,10 @@ void DistanceSensorRead() {
         sprintf(text_buffer, "%d mm", global_maxDistance);
         lv_label_set_text(ui_lblMaxDistanceValue, text_buffer);
       }
+
       ReadTankLevelinLiters();
+      UpdateChartActualLiter();
+      //UpdateChartActualLiterRightToLeft();
   }
 }
 
@@ -841,7 +1019,7 @@ void printHeapStatus() {
 }
 
 void CalcMaxTanklevel() {
-  // Calculate global_MaxTankLevel in liters (dm^3)
+  // Calculate global_MaxTankLevelInLiter in liters (dm^3)
   float radius;
   float height;
   float width;
@@ -851,25 +1029,40 @@ void CalcMaxTanklevel() {
     // Volume = π * r^2 * h
     radius = global_cilDiameter / 200.0f; // Convert mm to dm
     height = global_cilHeight / 100.0f; // Convert mm to dm
-    global_MaxTankLevel = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
+    global_MaxTankLevelInLiter = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
   } else if (global_tankType == 1) { // Rectangle
     // Volume = width * depth * height
     width = global_rectWide / 100.0f; // Convert mm to dm
     depth = global_rectDepth / 100.0f; // Convert mm to dm
     height = global_rectHeight / 100.0f; // Convert mm to dm
-    global_MaxTankLevel = width * depth * height; // Volume in liters (dm^3)
+    global_MaxTankLevelInLiter = width * depth * height; // Volume in liters (dm^3)
   }
   Serial.println("Calculating Max Tank Level...");
   Serial.printf("Width (dm): %.2f\n", width);
   Serial.printf("Depth (dm): %.2f\n", depth);
   Serial.printf("Height (dm): %.2f\n", height);
-  Serial.printf("Calculated Volume (liters): %.2f\n", global_MaxTankLevel);
+  Serial.printf("Calculated Volume (liters): %.2f\n", global_MaxTankLevelInLiter);
   // Update the UI label with the calculated maximum tank level
-  sprintf(text_buffer, "%d L", (int)global_MaxTankLevel);
-  lv_label_set_text(ui_lblMaxValue, text_buffer);
-  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
-	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
-  
+  //sprintf(text_buffer, "%d L", (int)global_MaxTankLevelInLiter);
+  //lv_label_set_text(ui_lblMaxValue, text_buffer);
+  // Set the maximum value of ui_BarCurrentState to global_MaxTankLevelInLiter
+	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevelInLiter);
+  int max_value = (int)global_MaxTankLevelInLiter;
+  Serial.printf("max_value: %d\n", max_value);
+  // Set the chart Y-axis range max to global_MaxTankLevelInLiter
+  lv_chart_set_range(ui_ChartActualLiter, LV_CHART_AXIS_PRIMARY_Y, 0, max_value);
+  lv_scale_set_range(ui_ChartActualLiter_Yaxis1,  0, max_value);
+  // Update the chart Y-axis range max to global_MaxTankLevelInLiter
+  //lv_scale_set_range(ui_ChartActualDistance_Yaxis1,  0, max_value);
+  lv_chart_refresh(ui_ChartActualLiter); // Refresh the chart to display the updated values
+
+
+//        lv_chart_set_range(ui_ChartActualDistance, LV_CHART_AXIS_PRIMARY_Y, 0, max_value);
+//        lv_scale_set_range(ui_ChartActualDistance_Yaxis1,  0, max_value);
+//        lv_chart_refresh(ui_ChartActualDistance); // Refresh the chart to display the updated values
+
+
+
   // Debugging all variables within CalcMaxTanklevel
   Serial.println("Debugging Variables in CalcMaxTanklevel:");
   Serial.printf("global_tankType: %u\n", global_tankType);
@@ -880,7 +1073,7 @@ void CalcMaxTanklevel() {
   Serial.printf("global_cilHeight: %u\n", global_cilHeight);
   Serial.printf("global_emptyTank: %u\n", global_emptyTank);
   Serial.printf("global_fullTank: %u\n", global_fullTank);
-  Serial.printf("global_MaxTankLevel: %.2f\n", global_MaxTankLevel);
+  Serial.printf("global_MaxTankLevelInLiter: %.2f\n", global_MaxTankLevelInLiter);
 }
 
 void ReadTankParamsFromEEPROM() {
@@ -947,7 +1140,225 @@ void ReadTankParamsFromEEPROM() {
 }
 
 
+void setupChart() {
 
+
+  // Create a cursor for the chart
+  static lv_chart_cursor_t *cursor = nullptr;
+  if (!cursor) {
+    cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
+  }
+
+  // Add event handler to show value on click/touch
+  lv_obj_add_event_cb(ui_ChartActualLiter, [](lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_CLICKED) {
+      lv_obj_t *chart = (lv_obj_t *)lv_event_get_target(e);
+      int32_t id = lv_chart_get_pressed_point(chart);
+      if (id == LV_CHART_POINT_NONE) return;
+
+      // Move the cursor to the selected point
+      lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
+      if (ser) {
+        lv_chart_set_cursor_point(chart, cursor, ser, id);
+
+        int32_t *y_array = lv_chart_get_y_array(chart, ser);
+        int32_t value = y_array[id];
+
+        // Show value in a label (or use LVGL message box/toast as needed)
+        static char buf[32];
+        snprintf(buf, sizeof(buf), "Érték: %d L", value);
+        lv_label_set_text(ui_lblCurrentLiter1, buf);
+      }
+    }
+  }, LV_EVENT_CLICKED, nullptr);
+
+
+
+  // Hozz létre egy kurzort a charton
+//  static lv_chart_cursor_t *cursor = nullptr;
+//  if (!cursor) {
+//      cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
+//  }
+//
+//  // Állítsd be az eseménykezelőt a chartra
+//  lv_obj_add_event_cb(ui_ChartActualLiter, [](lv_event_t *e) {
+//      lv_event_code_t code = lv_event_get_code(e);
+//      lv_obj_t *chart = (lv_obj_t *)lv_event_get_target(e);
+//
+//      if (code == LV_EVENT_CLICKED) {
+//          int32_t id = lv_chart_get_pressed_point(chart);
+//          if (id == LV_CHART_POINT_NONE) return;
+//
+//          LV_LOG_USER("Selected point %d", (int)id);
+//
+//          lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
+//          while (ser) {
+//              lv_point_t p;
+//              lv_chart_get_point_pos_by_id(chart, ser, id, &p);
+//
+//              int32_t *y_array = lv_chart_get_y_array(chart, ser);
+//              int32_t value = y_array[id];
+//
+//              char buf[16];
+//              lv_snprintf(buf, sizeof(buf), "%d", value);
+//
+//              lv_draw_rect_dsc_t draw_rect_dsc;
+//              lv_draw_rect_dsc_init(&draw_rect_dsc);
+//              draw_rect_dsc.bg_color = lv_color_black();
+//              draw_rect_dsc.bg_opa = LV_OPA_50;
+//              draw_rect_dsc.radius = 3;
+//              draw_rect_dsc.bg_image_src = buf;
+//              draw_rect_dsc.bg_image_recolor = lv_color_white();
+//
+//              lv_area_t chart_obj_coords;
+//              lv_obj_get_coords(chart, &chart_obj_coords);
+//              lv_area_t a;
+//              a.x1 = chart_obj_coords.x1 + p.x - 20;
+//              a.x2 = chart_obj_coords.x1 + p.x + 20;
+//              a.y1 = chart_obj_coords.y1 + p.y - 30;
+//              a.y2 = chart_obj_coords.y1 + p.y - 10;
+//
+//              lv_layer_t *layer = lv_event_get_layer(e);
+//              lv_draw_rect(layer, &draw_rect_dsc, &a);
+//
+//              ser = lv_chart_get_series_next(chart, ser);
+//          }
+//      }
+//  }, LV_EVENT_ALL, nullptr);
+
+//  /* Az X-tengely feliratainak létrehozása */
+//  static const char *x_labels[] = {"12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0", NULL};
+//
+//  /* Hozz létre egy skálát az X-tengelyhez az alsó oldalra */
+//  lv_obj_t *scale_bottom = lv_scale_create(lv_obj_get_parent(ui_ChartActualLiter)); // A grafikon szülőjéhez add hozzá
+//  lv_scale_set_mode(scale_bottom, LV_SCALE_MODE_HORIZONTAL_BOTTOM); // Ez az alsó oldalra helyezi
+//  lv_obj_set_size(scale_bottom, lv_obj_get_width(ui_ChartActualLiter)-15, 25); // Szélesség: a grafikon szélessége, magasság: 25 pixel
+//  lv_obj_align_to(scale_bottom, ui_ChartActualLiter, LV_ALIGN_OUT_BOTTOM_MID, 0, 1); // Igazítás a grafikon alá, 1 pixel távolsággal
+//
+//  /* Állítsd be a feliratokat az X-tengelyhez */
+//  lv_scale_set_text_src(scale_bottom, x_labels);
+//  //lv_scale_set_total_tick_count(scale_bottom, 13, 0); // 13 tick line (0-tól 12-ig)
+//  lv_obj_set_width(scale_bottom, lv_obj_get_width(ui_ChartActualLiter));
+
+// Állítsd be, hogy a grafikonon ne jelenjenek meg pontok, csak a vonal legyen látható
+//lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE); // Csak vonal
+//lv_obj_set_style_size(ui_ChartActualLiter, 0, 0, LV_PART_INDICATOR); // Pontméret 0, így nem látszanak a pontok
+
+// Állítsd be a grafikon típusát
+lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE); // Csak vonal
+lv_obj_set_style_size(ui_ChartActualLiter, 0, 0, LV_PART_INDICATOR); // Pontméret 0, így nem látszanak a pontok
+
+//  // Fade-elés beállítása
+//  lv_obj_set_style_opa(ui_ChartActualLiter, LV_OPA_COVER, LV_PART_MAIN);
+//  lv_obj_set_style_line_opa(ui_ChartActualLiter, LV_OPA_80, LV_PART_ITEMS);
+//  lv_obj_set_style_line_width(ui_ChartActualLiter, 3, LV_PART_ITEMS);
+//  lv_obj_set_style_line_color(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_BLUE), LV_PART_ITEMS);
+//  lv_obj_set_style_bg_opa(ui_ChartActualLiter, LV_OPA_20, LV_PART_INDICATOR);
+//  lv_obj_set_style_bg_color(ui_ChartActualLiter, lv_palette_lighten(LV_PALETTE_BLUE, 3), LV_PART_INDICATOR);
+//  
+//  // Enable area under the line (faded effect)
+//  lv_obj_set_style_bg_opa(ui_ChartActualLiter, LV_OPA_40, LV_PART_ITEMS);
+//  lv_obj_set_style_bg_color(ui_ChartActualLiter, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_ITEMS);
+//  
+//  // Egyedi osztóvonalak
+//  lv_chart_set_div_line_count(ui_ChartActualLiter, 5, 6); // 5 vízszintes, 6 függőleges
+//  lv_obj_set_style_line_color(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+//  lv_obj_set_style_line_opa(ui_ChartActualLiter, LV_OPA_40, LV_PART_MAIN);
+//  lv_obj_set_style_line_width(ui_ChartActualLiter, 1, LV_PART_MAIN);
+
+// Frissítsd a grafikont
+lv_chart_refresh(ui_ChartActualLiter);
+}
+
+void freeLVGLMemory() {
+  Serial.println("Freeing LVGL memory...");
+  lv_obj_clean(lv_scr_act()); // Törli az aktuális képernyő összes objektumát
+  lv_mem_monitor_t mem_mon;
+  lv_mem_monitor(&mem_mon);
+  Serial.printf("LVGL Total: %d bytes, Free: %d bytes, Largest Free: %d bytes\n",
+                (int)mem_mon.total_size, (int)mem_mon.free_size, (int)mem_mon.free_biggest_size);
+  lv_deinit(); // LVGL deinitializálása
+  delay(3000); // Adj időt a memória felszabadítására
+}
+
+void checkForUpdate() {
+  Serial.println("--------------------------------");
+  Serial.println("Checking for firmware updates...");
+  Serial.printf("Free heap before OTA: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+
+  // Optionally deinitialize LVGL to free memory
+  if (lvgl_enabled) {
+    Serial.println("Deinitializing LVGL to free memory...");
+    freeLVGLMemory();
+    //lvgl_enabled = false;
+    Serial.printf("Free heap after LVGL deinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+}
+
+  const char* versionUrl = "https://raw.githubusercontent.com/Kislac/water-tank-monitor/main/data/version.txt";
+
+  WiFiClientSecure client;
+  client.setInsecure(); // Skip certificate validation
+
+  HTTPClient http;
+  if (http.begin(client, versionUrl)) {
+      int httpCode = http.GET();
+
+      if (httpCode == HTTP_CODE_OK) {
+          String version = http.getString();
+          version.trim();
+          Serial.printf("Remote version.txt content: '%s'\n", version.c_str());
+
+          if (version.toInt() > build_number) {
+              Serial.println("New firmware available. Updating...");
+              // Call OTA update process here
+          } else {
+              Serial.println("Firmware is up to date.");
+          }
+      } else {
+          Serial.printf("HTTP error: %d\n", httpCode);
+      }
+
+      http.end();
+  } else {
+      Serial.println("HTTPS connection failed.");
+  }
+
+  // Reinitialize LVGL after OTA/check
+  if (!lvgl_enabled) {
+    Serial.println("Reinitializing LVGL...");
+    smartdisplay_init();
+    ui_init();
+    lvgl_enabled = true;
+    Serial.printf("Free heap after LVGL reinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+  }
+
+  Serial.println("--------------------------------");
+  Serial.println("Firmware update check completed.");
+}
+
+
+void ReadBacklightSettingsFromEEPROM() {
+  EEPROM.begin(512);
+  uint8_t mode = EEPROM.read(300); // 1 = Manual, 0 = Automatic
+  uint8_t value = EEPROM.read(301); // 0-100
+
+  Serial.printf("ReadBacklightSettingsFromEEPROM: mode=%u, value=%u\n", mode, value);
+
+  if (mode == 0) {
+    lv_obj_clear_state(ui_switchManualAutomatic, LV_STATE_CHECKED); // Manual mode
+  } else {
+    lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_CHECKED); // Automatic mode
+  }
+
+  lv_slider_set_value(ui_LigthSensorSlider, value, LV_ANIM_OFF);
+  float lcd_set_backlight = (float)value / 100;
+  smartdisplay_lcd_set_backlight(max(lcd_set_backlight, 0.01f));
+  sprintf(text_buffer, "%d%%", value);
+  lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
+
+  EEPROM.end();
+}
 
 
 void setup() {
@@ -987,20 +1398,21 @@ void setup() {
   // lv_disp_set_rotation(disp, LV_DISP_ROT_270);
   Serial.println("Starting ui_init()...");
   ui_init();
+  
 
   Serial.println("Starting the program...");
 
-  // Set the screen brightness to 50% initially
-  smartdisplay_lcd_set_backlight(max(((float)(SCREEN_INITIAL_BRIGHTNESS) / 100), 0.01f));
-  // Update the ui_LigthSensorSlider to reflect the 50% brightness
-  lv_slider_set_value(ui_LigthSensorSlider, SCREEN_INITIAL_BRIGHTNESS, LV_ANIM_OFF);
-  sprintf(text_buffer, "%d%%", SCREEN_INITIAL_BRIGHTNESS);
-  lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
-
-  // Set the switch to automatic mode initially LV_STATE_CHECKED
-  lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_CHECKED); //automatic mode
-  //lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_DEFAULT); //manual mode
-
+//  // Set the screen brightness to 50% initially
+//  smartdisplay_lcd_set_backlight(max(((float)(SCREEN_INITIAL_BRIGHTNESS) / 100), 0.01f));
+//  // Update the ui_LigthSensorSlider to reflect the 50% brightness
+//  lv_slider_set_value(ui_LigthSensorSlider, SCREEN_INITIAL_BRIGHTNESS, LV_ANIM_OFF);
+//  sprintf(text_buffer, "%d%%", SCREEN_INITIAL_BRIGHTNESS);
+//  lv_label_set_text(ui_lblLigthSensorSliderValue, text_buffer);
+//
+//  // Set the switch to automatic mode initially LV_STATE_CHECKED
+//  lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_CHECKED); //automatic mode
+//  //lv_obj_add_state(ui_switchManualAutomatic, LV_STATE_DEFAULT); //manual mode
+  ReadBacklightSettingsFromEEPROM();
 
 
   //wifi
@@ -1017,23 +1429,24 @@ void setup() {
   ReadTankParamsFromEEPROM();
   //CalcMaxTanklevel();
 
+  setupChart(); // Kurzor beállítása a charton
 
-  Serial.begin(115200);
+  //checkForUpdate();  // Ellenőrzés induláskor
 
-  if (psramFound()) {
-      Serial.println("PSRAM is available!");
-      Serial.printf("Total PSRAM: %d bytes\n", ESP.getPsramSize());
-      Serial.printf("Free PSRAM: %d bytes\n", ESP.getFreePsram());
-  } else {
-      Serial.println("PSRAM is NOT available.");
-  }
+  //if (psramFound()) {
+  //    Serial.println("PSRAM is available!");
+  //    Serial.printf("Total PSRAM: %d bytes\n", ESP.getPsramSize());
+  //    Serial.printf("Free PSRAM: %d bytes\n", ESP.getFreePsram());
+  //} else {
+  //    Serial.println("PSRAM is NOT available.");
+  //}
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
-    static ulong lastHeapPrint = 0;
+    //static ulong lastHeapPrint = 0;
 //    if (now - lastHeapPrint >= 2000) {
 //      lastHeapPrint = now;
 //      printHeapStatus();
@@ -1056,10 +1469,12 @@ void loop() {
       client.loop();
 
     publishMQTTSensoraDatas();
-    // Update the ticker
-    lv_tick_inc(now - lv_last_tick);
-    lv_last_tick = now;
-    // Update the UI
-    lv_timer_handler();
+    if (lvgl_enabled) {
+      // Update the ticker
+      lv_tick_inc(now - lv_last_tick);
+      lv_last_tick = now;
+      // Update the UI
+      lv_timer_handler();
+    }
 }
 

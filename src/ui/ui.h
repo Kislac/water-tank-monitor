@@ -26,14 +26,17 @@ extern lv_obj_t * ui_imWifiInternetOK1;
 extern lv_obj_t * ui_imWifiDisconnected1;
 extern lv_obj_t * ui_imWifiConnectedNoInternet1;
 extern lv_obj_t * ui_lblDataNTime;
+extern lv_obj_t * ui_lblWifiRSSI2;
 extern lv_obj_t * ui_MainTabView;
 extern lv_obj_t * ui_Main;
+extern lv_obj_t * ui_PanelBar;
 extern lv_obj_t * ui_BarCurrentState;
 extern lv_obj_t * ui_lblCurrentLiter1;
 extern lv_obj_t * ui_lblMaxValue;
 extern lv_obj_t * ui_lblMinValue;
 extern lv_obj_t * ui_lblMax;
 extern lv_obj_t * ui_lblMin;
+extern lv_obj_t * ui_Panel3;
 extern lv_obj_t * ui_lblCurrentLiter;
 extern lv_obj_t * ui_THPanel;
 extern lv_obj_t * ui_lblTempValue;
@@ -42,11 +45,13 @@ extern lv_obj_t * ui_Chart2;
 extern lv_obj_t * ui_Chart2_Xaxis;
 extern lv_obj_t * ui_Chart2_Yaxis1;
 extern lv_obj_t * ui_Chart2_Yaxis2;
-extern lv_obj_t * ui_lblH;
-extern lv_obj_t * ui_ChartActualDistance;
-extern lv_obj_t * ui_ChartActualDistance_Xaxis;
-extern lv_obj_t * ui_ChartActualDistance_Yaxis1;
-extern lv_obj_t * ui_ChartActualDistance_Yaxis2;
+extern lv_obj_t * ui_lblL;
+extern lv_obj_t * ui_ChartActualLiter;
+extern lv_obj_t * ui_ChartActualLiter_Xaxis;
+extern lv_obj_t * ui_ChartActualLiter_Yaxis1;
+extern lv_obj_t * ui_ChartActualLiter_Yaxis2;
+extern lv_obj_t * ui_lblH1;
+extern lv_obj_t * ui_lblPer;
 extern lv_obj_t * ui_Statistic;
 extern lv_obj_t * ui_Container5;
 extern lv_obj_t * ui_Panel2;
@@ -98,6 +103,7 @@ extern lv_obj_t * ui_Label36;
 void ui_event_Button3(lv_event_t * e);
 extern lv_obj_t * ui_Button3;
 extern lv_obj_t * ui_Label37;
+extern lv_obj_t * ui_lblSaved;
 void ui_event_ParamKeyboard(lv_event_t * e);
 extern lv_obj_t * ui_ParamKeyboard;
 extern lv_obj_t * ui_Settings;
@@ -115,6 +121,7 @@ void ui_event_Switch2(lv_event_t * e);
 extern lv_obj_t * ui_Switch2;
 extern lv_obj_t * ui_ContBackLigth;
 extern lv_obj_t * ui_lblBackLight;
+void ui_event_switchManualAutomatic(lv_event_t * e);
 extern lv_obj_t * ui_switchManualAutomatic;
 extern lv_obj_t * ui_Label6;
 extern lv_obj_t * ui_lblLigthSensorValue;
@@ -141,6 +148,9 @@ extern lv_obj_t * ui_lblBuildDateValue;
 extern lv_obj_t * ui_ConBuildVersion;
 extern lv_obj_t * ui_lblBuildVersion;
 extern lv_obj_t * ui_lblBuildVersionValue;
+void ui_event_btnFWUpdate(lv_event_t * e);
+extern lv_obj_t * ui_btnFWUpdate;
+extern lv_obj_t * ui_Label38;
 extern lv_obj_t * ui_ConRunTime;
 extern lv_obj_t * ui_lblRunTime;
 extern lv_obj_t * ui_lblRunTimeValue;
@@ -150,6 +160,12 @@ extern lv_obj_t * ui_lblGitHub;
 extern lv_obj_t * ui_ConAuth;
 extern lv_obj_t * ui_lblGit1;
 extern lv_obj_t * ui_lblGitHub1;
+extern lv_obj_t * ui_ConPayPall;
+extern lv_obj_t * ui_lblGit2;
+void ui_event_Button8(lv_event_t * e);
+extern lv_obj_t * ui_Button8;
+extern lv_obj_t * ui_lblPaypall;
+extern lv_obj_t * ui_Image1;
 // SCREEN: ui_Wifi_Settings
 void ui_Wifi_Settings_screen_init(void);
 extern lv_obj_t * ui_Wifi_Settings;
@@ -273,6 +289,7 @@ extern lv_obj_t * ui____initial_actions0;
 LV_IMG_DECLARE(ui_img_wifiinternetok_png);    // assets/WifiInternetOK.png
 LV_IMG_DECLARE(ui_img_wifidisconnected_png);    // assets/WifiDisconnected.png
 LV_IMG_DECLARE(ui_img_wificonnectednointernet_png);    // assets/WifiConnectedNoInternet.png
+LV_IMG_DECLARE(ui_img_qrcode_2_png);    // assets/qrcode_2.png
 
 
 

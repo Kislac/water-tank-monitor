@@ -86,3 +86,11 @@ def funcParamKeyboardOk(event_struct):
 def funcParamSave(event_struct):
     return
 
+
+def funcCheckFW(event_struct):
+    return
+
+
+def funcBackLightButton(event_struct):
+    return
+

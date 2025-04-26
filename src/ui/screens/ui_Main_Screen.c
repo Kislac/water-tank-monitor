@@ -69,13 +69,23 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_remove_flag(ui_imWifiConnectedNoInternet1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_lblDataNTime = lv_label_create(ui_TopInfoBar1);
-    lv_obj_set_width(ui_lblDataNTime, lv_pct(45));
+    lv_obj_set_width(ui_lblDataNTime, lv_pct(49));
     lv_obj_set_height(ui_lblDataNTime, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblDataNTime, -30);
+    lv_obj_set_x(ui_lblDataNTime, -20);
     lv_obj_set_y(ui_lblDataNTime, 0);
     lv_obj_set_align(ui_lblDataNTime, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_lblDataNTime, "2025.04.10 11:17:32");
     lv_obj_set_style_text_align(ui_lblDataNTime, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_lblDataNTime, &ui_font_DejaVuSansMono14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_lblWifiRSSI2 = lv_label_create(ui_TopInfoBar1);
+    lv_obj_set_width(ui_lblWifiRSSI2, 75);
+    lv_obj_set_height(ui_lblWifiRSSI2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_lblWifiRSSI2, 40);
+    lv_obj_set_y(ui_lblWifiRSSI2, 1);
+    lv_obj_set_align(ui_lblWifiRSSI2, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_lblWifiRSSI2, "-102 dBm");
+    lv_obj_set_style_text_align(ui_lblWifiRSSI2, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_MainTabView = lv_tabview_create(ui_Main_Screen);
     lv_tabview_set_tab_bar_size(ui_MainTabView, 30);
@@ -84,7 +94,8 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_x(ui_MainTabView, 0);
     lv_obj_set_y(ui_MainTabView, 22);
     lv_obj_set_align(ui_MainTabView, LV_ALIGN_TOP_MID);
-    lv_obj_remove_flag(ui_MainTabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_remove_flag(ui_MainTabView, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                       LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
     ui_object_set_themeable_style_property(ui_MainTabView, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
                                            _ui_theme_color_BackGround);
     ui_object_set_themeable_style_property(ui_MainTabView, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
@@ -111,7 +122,7 @@ void ui_Main_Screen_screen_init(void)
                                  LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Main = lv_tabview_add_tab(ui_MainTabView, "Main");
-    lv_obj_remove_flag(ui_Main, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_remove_flag(ui_Main, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN);      /// Flags
     ui_object_set_themeable_style_property(ui_Main, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
                                            _ui_theme_color_BackGround);
     ui_object_set_themeable_style_property(ui_Main, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
@@ -121,15 +132,22 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_pad_top(ui_Main, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_Main, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_BarCurrentState = lv_bar_create(ui_Main);
+    ui_PanelBar = lv_obj_create(ui_Main);
+    lv_obj_set_width(ui_PanelBar, 235);
+    lv_obj_set_height(ui_PanelBar, 46);
+    lv_obj_set_x(ui_PanelBar, 3);
+    lv_obj_set_y(ui_PanelBar, -1);
+    lv_obj_remove_flag(ui_PanelBar, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_BarCurrentState = lv_bar_create(ui_PanelBar);
     lv_bar_set_range(ui_BarCurrentState, 0, 4500);
     lv_bar_set_value(ui_BarCurrentState, 2000, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarCurrentState, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarCurrentState, 161);
     lv_obj_set_height(ui_BarCurrentState, 15);
-    lv_obj_set_x(ui_BarCurrentState, -38);
-    lv_obj_set_y(ui_BarCurrentState, -72);
-    lv_obj_set_align(ui_BarCurrentState, LV_ALIGN_CENTER);
+    lv_obj_set_width(ui_BarCurrentState, lv_pct(100));
+    lv_obj_set_x(ui_BarCurrentState, 0);
+    lv_obj_set_y(ui_BarCurrentState, -10);
+    lv_obj_set_align(ui_BarCurrentState, LV_ALIGN_TOP_MID);
 
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
     if(lv_obj_get_style_pad_top(ui_BarCurrentState, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_BarCurrentState,
@@ -144,61 +162,70 @@ void ui_Main_Screen_screen_init(void)
     ui_object_set_themeable_style_property(ui_lblCurrentLiter1, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_lblMaxValue = lv_label_create(ui_Main);
+    ui_lblMaxValue = lv_label_create(ui_PanelBar);
     lv_obj_set_width(ui_lblMaxValue, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblMaxValue, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblMaxValue, 64);
-    lv_obj_set_y(ui_lblMaxValue, -51);
-    lv_obj_set_align(ui_lblMaxValue, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblMaxValue, "4500");
+    lv_obj_set_x(ui_lblMaxValue, 10);
+    lv_obj_set_y(ui_lblMaxValue, 10);
+    lv_obj_set_align(ui_lblMaxValue, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_lblMaxValue, "4500L");
+    lv_obj_add_flag(ui_lblMaxValue, LV_OBJ_FLAG_HIDDEN);     /// Flags
     ui_object_set_themeable_style_property(ui_lblMaxValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblMaxValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_lblMinValue = lv_label_create(ui_Main);
+    ui_lblMinValue = lv_label_create(ui_PanelBar);
     lv_obj_set_width(ui_lblMinValue, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblMinValue, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblMinValue, -138);
-    lv_obj_set_y(ui_lblMinValue, -50);
-    lv_obj_set_align(ui_lblMinValue, LV_ALIGN_CENTER);
+    lv_obj_set_x(ui_lblMinValue, -10);
+    lv_obj_set_y(ui_lblMinValue, 10);
     lv_label_set_text(ui_lblMinValue, "0");
+    lv_obj_add_flag(ui_lblMinValue, LV_OBJ_FLAG_HIDDEN);     /// Flags
     ui_object_set_themeable_style_property(ui_lblMinValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblMinValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_lblMax = lv_label_create(ui_Main);
+    ui_lblMax = lv_label_create(ui_PanelBar);
     lv_obj_set_width(ui_lblMax, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblMax, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblMax, 65);
-    lv_obj_set_y(ui_lblMax, -72);
+    lv_obj_set_x(ui_lblMax, -79);
+    lv_obj_set_y(ui_lblMax, 7);
     lv_obj_set_align(ui_lblMax, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lblMax, "Max");
+    lv_obj_add_flag(ui_lblMax, LV_OBJ_FLAG_HIDDEN);     /// Flags
     ui_object_set_themeable_style_property(ui_lblMax, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblMax, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_lblMin = lv_label_create(ui_Main);
+    ui_lblMin = lv_label_create(ui_PanelBar);
     lv_obj_set_width(ui_lblMin, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblMin, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblMin, -139);
-    lv_obj_set_y(ui_lblMin, -71);
+    lv_obj_set_x(ui_lblMin, -80);
+    lv_obj_set_y(ui_lblMin, -14);
     lv_obj_set_align(ui_lblMin, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lblMin, "Min");
+    lv_obj_add_flag(ui_lblMin, LV_OBJ_FLAG_HIDDEN);     /// Flags
     ui_object_set_themeable_style_property(ui_lblMin, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblMin, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_lblCurrentLiter = lv_label_create(ui_Main);
+    ui_Panel3 = lv_obj_create(ui_PanelBar);
+    lv_obj_set_height(ui_Panel3, 23);
+    lv_obj_set_width(ui_Panel3, lv_pct(65));
+    lv_obj_set_x(ui_Panel3, 0);
+    lv_obj_set_y(ui_Panel3, 10);
+    lv_obj_set_align(ui_Panel3, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(ui_Panel3, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_lblCurrentLiter = lv_label_create(ui_Panel3);
     lv_obj_set_width(ui_lblCurrentLiter, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_lblCurrentLiter, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblCurrentLiter, -39);
-    lv_obj_set_y(ui_lblCurrentLiter, -48);
     lv_obj_set_align(ui_lblCurrentLiter, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblCurrentLiter, "1555");
+    lv_label_set_text(ui_lblCurrentLiter, "1555L / 4500L");
     ui_object_set_themeable_style_property(ui_lblCurrentLiter, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblCurrentLiter, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
@@ -328,84 +355,111 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_outline_pad(ui_Chart2, LV_MAX3(50, 50, 25),
                                  LV_PART_MAIN | LV_STATE_DEFAULT);   //workaround for ineffective 'overflow visible' flag
     lv_obj_set_style_outline_width(ui_Chart2, -1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    ui_lblH = lv_label_create(ui_Main);
-    lv_obj_set_width(ui_lblH, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_lblH, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lblH, -145);
-    lv_obj_set_y(ui_lblH, 83);
-    lv_obj_set_align(ui_lblH, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_lblH, "[h]");
-    ui_object_set_themeable_style_property(ui_lblH, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+    ui_lblL = lv_label_create(ui_Main);
+    lv_obj_set_width(ui_lblL, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblL, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_lblL, -147);
+    lv_obj_set_y(ui_lblL, 61);
+    lv_obj_set_align(ui_lblL, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblL, "[L]");
+    ui_object_set_themeable_style_property(ui_lblL, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
                                            _ui_theme_color_FontColor);
-    ui_object_set_themeable_style_property(ui_lblH, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+    ui_object_set_themeable_style_property(ui_lblL, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
 
-    ui_ChartActualDistance = lv_chart_create(ui_Main);
-    lv_obj_set_width(ui_ChartActualDistance, 246);
-    lv_obj_set_height(ui_ChartActualDistance, 97);
-    lv_obj_set_x(ui_ChartActualDistance, 17);
-    lv_obj_set_y(ui_ChartActualDistance, 17);
-    lv_obj_set_align(ui_ChartActualDistance, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ChartActualDistance, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
-    lv_obj_remove_flag(ui_ChartActualDistance, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_add_flag(ui_ChartActualDistance,
+    ui_ChartActualLiter = lv_chart_create(ui_Main);
+    lv_obj_set_width(ui_ChartActualLiter, 231);
+    lv_obj_set_height(ui_ChartActualLiter, 110);
+    lv_obj_set_x(ui_ChartActualLiter, 6);
+    lv_obj_set_y(ui_ChartActualLiter, 17);
+    lv_obj_set_align(ui_ChartActualLiter, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ChartActualLiter, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_remove_flag(ui_ChartActualLiter, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_flag(ui_ChartActualLiter,
                     LV_OBJ_FLAG_OVERFLOW_VISIBLE);      //make scales visible - Should it be forced to True?
-    //lv_obj_remove_flag( ui_ChartActualDistance, LV_OBJ_FLAG_SCROLLABLE );    //no chart-zoom in LVGL9 - Shouldn't it be forced to False?
-    lv_chart_set_type(ui_ChartActualDistance, LV_CHART_TYPE_LINE);
-    lv_chart_set_range(ui_ChartActualDistance, LV_CHART_AXIS_PRIMARY_Y, 0, 3200);
+    //lv_obj_remove_flag( ui_ChartActualLiter, LV_OBJ_FLAG_SCROLLABLE );    //no chart-zoom in LVGL9 - Shouldn't it be forced to False?
+    lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE);
+    lv_chart_set_point_count(ui_ChartActualLiter, 30);
+    lv_chart_set_range(ui_ChartActualLiter, LV_CHART_AXIS_PRIMARY_Y, 0, 3200);
+    lv_chart_set_div_line_count(ui_ChartActualLiter, 5, 5);
 
-    ui_ChartActualDistance_Xaxis = lv_scale_create(ui_ChartActualDistance);
-    lv_scale_set_mode(ui_ChartActualDistance_Xaxis, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
-    lv_obj_set_size(ui_ChartActualDistance_Xaxis, lv_pct(100), 50);
-    lv_obj_set_align(ui_ChartActualDistance_Xaxis, LV_ALIGN_BOTTOM_MID);
-    lv_obj_set_y(ui_ChartActualDistance_Xaxis, 50 + lv_obj_get_style_pad_bottom(ui_ChartActualDistance,
-                                                                                LV_PART_MAIN) + lv_obj_get_style_border_width(ui_ChartActualDistance, LV_PART_MAIN));
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Xaxis, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Xaxis, 1, LV_PART_ITEMS);   //LVGL-9.1 ticks are thicker by default
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Xaxis, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_ChartActualDistance_Xaxis, 5, LV_PART_ITEMS);      //minor tick length
-    lv_obj_set_style_length(ui_ChartActualDistance_Xaxis, 10, LV_PART_INDICATOR);      //major tick length
-    lv_scale_set_range(ui_ChartActualDistance_Xaxis, 0, 5 > 0 ? 5 - 1 : 0);
-    lv_scale_set_total_tick_count(ui_ChartActualDistance_Xaxis, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
-    lv_scale_set_major_tick_every(ui_ChartActualDistance_Xaxis, 2 >= 1 ? 2 : 1);
-    ui_ChartActualDistance_Yaxis1 = lv_scale_create(ui_ChartActualDistance);
-    lv_scale_set_mode(ui_ChartActualDistance_Yaxis1, LV_SCALE_MODE_VERTICAL_LEFT);
-    lv_obj_set_size(ui_ChartActualDistance_Yaxis1, 30, lv_pct(100));
-    lv_obj_set_align(ui_ChartActualDistance_Yaxis1, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(ui_ChartActualDistance_Yaxis1, -30 - lv_obj_get_style_pad_left(ui_ChartActualDistance,
-                                                                                LV_PART_MAIN) - lv_obj_get_style_border_width(ui_ChartActualDistance, LV_PART_MAIN) + 2);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis1, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis1, 1, LV_PART_ITEMS);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis1, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_ChartActualDistance_Yaxis1, 5, LV_PART_ITEMS);   //minor tick length
-    lv_obj_set_style_length(ui_ChartActualDistance_Yaxis1, 10, LV_PART_INDICATOR);   //major tick length
-    lv_scale_set_range(ui_ChartActualDistance_Yaxis1,  0, 3200);
-    lv_scale_set_total_tick_count(ui_ChartActualDistance_Yaxis1, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
-    lv_scale_set_major_tick_every(ui_ChartActualDistance_Yaxis1, 2 >= 1 ? 2 : 1);
-    ui_ChartActualDistance_Yaxis2 = lv_scale_create(ui_ChartActualDistance);
-    lv_scale_set_mode(ui_ChartActualDistance_Yaxis2, LV_SCALE_MODE_VERTICAL_RIGHT);
-    lv_obj_set_size(ui_ChartActualDistance_Yaxis2, 25, lv_pct(100));
-    lv_obj_set_align(ui_ChartActualDistance_Yaxis2, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(ui_ChartActualDistance_Yaxis2, 25 + lv_obj_get_style_pad_right(ui_ChartActualDistance,
-                                                                                LV_PART_MAIN) + lv_obj_get_style_border_width(ui_ChartActualDistance, LV_PART_MAIN) + 1);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis2, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis2, 1, LV_PART_ITEMS);
-    lv_obj_set_style_line_width(ui_ChartActualDistance_Yaxis2, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_ChartActualDistance_Yaxis2, 0, LV_PART_ITEMS);   //minor tick length
-    lv_obj_set_style_length(ui_ChartActualDistance_Yaxis2, 10, LV_PART_INDICATOR);   //major tick length
-    lv_scale_set_total_tick_count(ui_ChartActualDistance_Yaxis2, (5 > 0 ? 5 - 1 : 0) * 0 + 1);
-    lv_scale_set_major_tick_every(ui_ChartActualDistance_Yaxis2, 0 >= 1 ? 0 : 1);
-    lv_scale_set_label_show(ui_ChartActualDistance_Yaxis2, false);
+    ui_ChartActualLiter_Xaxis = lv_scale_create(ui_ChartActualLiter);
+    lv_scale_set_mode(ui_ChartActualLiter_Xaxis, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_obj_set_size(ui_ChartActualLiter_Xaxis, lv_pct(100), 50);
+    lv_obj_set_align(ui_ChartActualLiter_Xaxis, LV_ALIGN_BOTTOM_MID);
+    lv_obj_set_y(ui_ChartActualLiter_Xaxis, 50 + lv_obj_get_style_pad_bottom(ui_ChartActualLiter,
+                                                                             LV_PART_MAIN) + lv_obj_get_style_border_width(ui_ChartActualLiter, LV_PART_MAIN));
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Xaxis, 0, LV_PART_MAIN);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Xaxis, 1, LV_PART_ITEMS);   //LVGL-9.1 ticks are thicker by default
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Xaxis, 1, LV_PART_INDICATOR);
+    lv_obj_set_style_length(ui_ChartActualLiter_Xaxis, 1, LV_PART_ITEMS);      //minor tick length
+    lv_obj_set_style_length(ui_ChartActualLiter_Xaxis, 5, LV_PART_INDICATOR);      //major tick length
+    lv_scale_set_range(ui_ChartActualLiter_Xaxis, 0, 13 > 0 ? 13 - 1 : 0);
+    lv_scale_set_total_tick_count(ui_ChartActualLiter_Xaxis, (13 > 0 ? 13 - 1 : 0) * 0 + 1);
+    lv_scale_set_major_tick_every(ui_ChartActualLiter_Xaxis, 0 >= 1 ? 0 : 1);
+    lv_scale_set_label_show(ui_ChartActualLiter_Xaxis, false);
+    ui_ChartActualLiter_Yaxis1 = lv_scale_create(ui_ChartActualLiter);
+    lv_scale_set_mode(ui_ChartActualLiter_Yaxis1, LV_SCALE_MODE_VERTICAL_LEFT);
+    lv_obj_set_size(ui_ChartActualLiter_Yaxis1, 30, lv_pct(100));
+    lv_obj_set_align(ui_ChartActualLiter_Yaxis1, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(ui_ChartActualLiter_Yaxis1, -30 - lv_obj_get_style_pad_left(ui_ChartActualLiter,
+                                                                             LV_PART_MAIN) - lv_obj_get_style_border_width(ui_ChartActualLiter, LV_PART_MAIN) + 2);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis1, 0, LV_PART_MAIN);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis1, 1, LV_PART_ITEMS);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis1, 1, LV_PART_INDICATOR);
+    lv_obj_set_style_length(ui_ChartActualLiter_Yaxis1, 5, LV_PART_ITEMS);   //minor tick length
+    lv_obj_set_style_length(ui_ChartActualLiter_Yaxis1, 10, LV_PART_INDICATOR);   //major tick length
+    lv_scale_set_range(ui_ChartActualLiter_Yaxis1,  0, 3200);
+    lv_scale_set_total_tick_count(ui_ChartActualLiter_Yaxis1, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
+    lv_scale_set_major_tick_every(ui_ChartActualLiter_Yaxis1, 2 >= 1 ? 2 : 1);
+    ui_ChartActualLiter_Yaxis2 = lv_scale_create(ui_ChartActualLiter);
+    lv_scale_set_mode(ui_ChartActualLiter_Yaxis2, LV_SCALE_MODE_VERTICAL_RIGHT);
+    lv_obj_set_size(ui_ChartActualLiter_Yaxis2, 25, lv_pct(100));
+    lv_obj_set_align(ui_ChartActualLiter_Yaxis2, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(ui_ChartActualLiter_Yaxis2, 25 + lv_obj_get_style_pad_right(ui_ChartActualLiter,
+                                                                             LV_PART_MAIN) + lv_obj_get_style_border_width(ui_ChartActualLiter, LV_PART_MAIN) + 1);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis2, 0, LV_PART_MAIN);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis2, 1, LV_PART_ITEMS);
+    lv_obj_set_style_line_width(ui_ChartActualLiter_Yaxis2, 1, LV_PART_INDICATOR);
+    lv_obj_set_style_length(ui_ChartActualLiter_Yaxis2, 3, LV_PART_ITEMS);   //minor tick length
+    lv_obj_set_style_length(ui_ChartActualLiter_Yaxis2, 5, LV_PART_INDICATOR);   //major tick length
+    lv_scale_set_total_tick_count(ui_ChartActualLiter_Yaxis2, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
+    lv_scale_set_major_tick_every(ui_ChartActualLiter_Yaxis2, 2 >= 1 ? 2 : 1);
 
 
 
     //This workaround (an invisible outline) is needed because without it chart overflow-visible doesn't work in LVGL-9.1
-    lv_obj_set_style_outline_pad(ui_ChartActualDistance, LV_MAX3(50, 30, 25),
+    lv_obj_set_style_outline_pad(ui_ChartActualLiter, LV_MAX3(50, 30, 25),
                                  LV_PART_MAIN | LV_STATE_DEFAULT);   //workaround for ineffective 'overflow visible' flag
-    lv_obj_set_style_outline_width(ui_ChartActualDistance, -1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_ChartActualLiter, -1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_lblH1 = lv_label_create(ui_Main);
+    lv_obj_set_width(ui_lblH1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblH1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_lblH1, -119);
+    lv_obj_set_y(ui_lblH1, 82);
+    lv_obj_set_align(ui_lblH1, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblH1, "[h]");
+    ui_object_set_themeable_style_property(ui_lblH1, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+                                           _ui_theme_color_FontColor);
+    ui_object_set_themeable_style_property(ui_lblH1, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+                                           _ui_theme_alpha_FontColor);
+
+    ui_lblPer = lv_label_create(ui_Main);
+    lv_obj_set_width(ui_lblPer, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblPer, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_lblPer, 148);
+    lv_obj_set_y(ui_lblPer, 60);
+    lv_obj_set_align(ui_lblPer, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblPer, "[%]");
+    ui_object_set_themeable_style_property(ui_lblPer, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+                                           _ui_theme_color_FontColor);
+    ui_object_set_themeable_style_property(ui_lblPer, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+                                           _ui_theme_alpha_FontColor);
+
     ui_Statistic = lv_tabview_add_tab(ui_MainTabView, "Statistic");
     lv_obj_set_flex_flow(ui_Statistic, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_Statistic, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_remove_flag(ui_Statistic, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN);      /// Flags
     lv_obj_set_style_pad_left(ui_Statistic, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_Statistic, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_Statistic, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -504,7 +558,7 @@ void ui_Main_Screen_screen_init(void)
     ui_Param = lv_tabview_add_tab(ui_MainTabView, "Param");
     lv_obj_set_flex_flow(ui_Param, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_Param, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_remove_flag(ui_Param, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_remove_flag(ui_Param, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN);      /// Flags
     lv_obj_set_style_pad_left(ui_Param, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_Param, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_Param, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -820,6 +874,13 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_align(ui_Label37, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Label37, "Save");
 
+    ui_lblSaved = lv_label_create(ui_ContButtons);
+    lv_obj_set_width(ui_lblSaved, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblSaved, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_lblSaved, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblSaved, "Saved");
+    lv_obj_add_flag(ui_lblSaved, LV_OBJ_FLAG_HIDDEN);     /// Flags
+
     ui_ParamKeyboard = lv_keyboard_create(ui_Param);
     lv_keyboard_set_mode(ui_ParamKeyboard, LV_KEYBOARD_MODE_NUMBER);
     lv_obj_set_width(ui_ParamKeyboard, lv_pct(100));
@@ -830,6 +891,7 @@ void ui_Main_Screen_screen_init(void)
     ui_Settings = lv_tabview_add_tab(ui_MainTabView, "Settings");
     lv_obj_set_flex_flow(ui_Settings, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_Settings, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_remove_flag(ui_Settings, LV_OBJ_FLAG_SCROLL_CHAIN);      /// Flags
     lv_obj_set_style_pad_left(ui_Settings, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_Settings, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_Settings, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1153,6 +1215,7 @@ void ui_Main_Screen_screen_init(void)
     ui_About = lv_tabview_add_tab(ui_MainTabView, "About");
     lv_obj_set_flex_flow(ui_About, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_About, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_remove_flag(ui_About, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN);      /// Flags
     lv_obj_set_style_pad_left(ui_About, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_About, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_About, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1227,6 +1290,21 @@ void ui_Main_Screen_screen_init(void)
                                            _ui_theme_color_FontColor);
     ui_object_set_themeable_style_property(ui_lblBuildVersionValue, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
                                            _ui_theme_alpha_FontColor);
+
+    ui_btnFWUpdate = lv_button_create(ui_ConBuildVersion);
+    lv_obj_set_width(ui_btnFWUpdate, 100);
+    lv_obj_set_height(ui_btnFWUpdate, 20);
+    lv_obj_set_x(ui_btnFWUpdate, 15);
+    lv_obj_set_y(ui_btnFWUpdate, 0);
+    lv_obj_set_align(ui_btnFWUpdate, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_btnFWUpdate, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_btnFWUpdate, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_Label38 = lv_label_create(ui_btnFWUpdate);
+    lv_obj_set_width(ui_Label38, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Label38, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_Label38, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label38, "Check FW");
 
     ui_ConRunTime = lv_obj_create(ui_About);
     lv_obj_remove_style_all(ui_ConRunTime);
@@ -1337,6 +1415,59 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_text_align(ui_lblGitHub1, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_lblGitHub1, &ui_font_MontserratRegular14ExtASCIMedium, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_ConPayPall = lv_obj_create(ui_About);
+    lv_obj_remove_style_all(ui_ConPayPall);
+    lv_obj_set_width(ui_ConPayPall, lv_pct(100));
+    lv_obj_set_height(ui_ConPayPall, LV_SIZE_CONTENT);    /// 50
+    lv_obj_set_align(ui_ConPayPall, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(ui_ConPayPall, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_ConPayPall, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_ConPayPall, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_ConPayPall, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_side(ui_ConPayPall, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_ConPayPall, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_ConPayPall, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_ConPayPall, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_ConPayPall, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_lblGit2 = lv_label_create(ui_ConPayPall);
+    lv_obj_set_width(ui_lblGit2, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblGit2, LV_SIZE_CONTENT);    /// 1
+    lv_label_set_text(ui_lblGit2, "Buy me a coffe");
+    ui_object_set_themeable_style_property(ui_lblGit2, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+                                           _ui_theme_color_FontColor);
+    ui_object_set_themeable_style_property(ui_lblGit2, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+                                           _ui_theme_alpha_FontColor);
+
+    ui_Button8 = lv_button_create(ui_ConPayPall);
+    lv_obj_set_width(ui_Button8, 100);
+    lv_obj_set_height(ui_Button8, 25);
+    lv_obj_set_align(ui_Button8, LV_ALIGN_TOP_RIGHT);
+    lv_obj_add_flag(ui_Button8, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_Button8, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_lblPaypall = lv_label_create(ui_Button8);
+    lv_obj_set_width(ui_lblPaypall, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_lblPaypall, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_lblPaypall, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_lblPaypall, "PayPall");
+    ui_object_set_themeable_style_property(ui_lblPaypall, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR,
+                                           _ui_theme_color_FontColor);
+    ui_object_set_themeable_style_property(ui_lblPaypall, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA,
+                                           _ui_theme_alpha_FontColor);
+    lv_obj_set_style_text_align(ui_lblPaypall, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_lblPaypall, &ui_font_MontserratRegular14ExtASCIMedium, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Image1 = lv_image_create(ui_ConPayPall);
+    lv_image_set_src(ui_Image1, &ui_img_qrcode_2_png);
+    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Image1, 0);
+    lv_obj_set_y(ui_Image1, 25);
+    lv_obj_set_align(ui_Image1, LV_ALIGN_TOP_MID);
+    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_remove_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
     lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DropdownParamTankType, ui_event_DropdownParamTankType, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_TextAreaRectangleWide, ui_event_TextAreaRectangleWide, LV_EVENT_ALL, NULL);
@@ -1352,8 +1483,11 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_add_event_cb(ui_btnWifi, ui_event_btnWifi, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_btnMQTT, ui_event_btnMQTT, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Switch2, ui_event_Switch2, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_switchManualAutomatic, ui_event_switchManualAutomatic, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_LigthSensorSlider, ui_event_LigthSensorSlider, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_btnRotate, ui_event_btnRotate, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_btnReset, ui_event_btnReset, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_btnFWUpdate, ui_event_btnFWUpdate, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Button8, ui_event_Button8, LV_EVENT_ALL, NULL);
 
 }

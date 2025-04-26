@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+void CalcMaxTanklevel();
+void checkForUpdate();
+
 // Deklaráld a security változót extern-ként
 extern String security;
 extern char global_mqtt_server[64];
@@ -22,6 +25,6 @@ extern uint16_t global_cilDiameter;
 extern uint16_t global_cilHeight;
 extern uint16_t global_emptyTank;
 extern uint16_t global_fullTank;
-extern float global_MaxTankLevel;
+extern float global_MaxTankLevelInLiter;
 extern float global_tankVolume;
 #endif // GLOBALS_H

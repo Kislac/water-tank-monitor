@@ -18,14 +18,17 @@ lv_obj_t * ui_imWifiInternetOK1;
 lv_obj_t * ui_imWifiDisconnected1;
 lv_obj_t * ui_imWifiConnectedNoInternet1;
 lv_obj_t * ui_lblDataNTime;
+lv_obj_t * ui_lblWifiRSSI2;
 lv_obj_t * ui_MainTabView;
 lv_obj_t * ui_Main;
+lv_obj_t * ui_PanelBar;
 lv_obj_t * ui_BarCurrentState;
 lv_obj_t * ui_lblCurrentLiter1;
 lv_obj_t * ui_lblMaxValue;
 lv_obj_t * ui_lblMinValue;
 lv_obj_t * ui_lblMax;
 lv_obj_t * ui_lblMin;
+lv_obj_t * ui_Panel3;
 lv_obj_t * ui_lblCurrentLiter;
 lv_obj_t * ui_THPanel;
 lv_obj_t * ui_lblTempValue;
@@ -34,11 +37,13 @@ lv_obj_t * ui_Chart2;
 lv_obj_t * ui_Chart2_Xaxis;
 lv_obj_t * ui_Chart2_Yaxis1;
 lv_obj_t * ui_Chart2_Yaxis2;
-lv_obj_t * ui_lblH;
-lv_obj_t * ui_ChartActualDistance;
-lv_obj_t * ui_ChartActualDistance_Xaxis;
-lv_obj_t * ui_ChartActualDistance_Yaxis1;
-lv_obj_t * ui_ChartActualDistance_Yaxis2;
+lv_obj_t * ui_lblL;
+lv_obj_t * ui_ChartActualLiter;
+lv_obj_t * ui_ChartActualLiter_Xaxis;
+lv_obj_t * ui_ChartActualLiter_Yaxis1;
+lv_obj_t * ui_ChartActualLiter_Yaxis2;
+lv_obj_t * ui_lblH1;
+lv_obj_t * ui_lblPer;
 lv_obj_t * ui_Statistic;
 lv_obj_t * ui_Container5;
 lv_obj_t * ui_Panel2;
@@ -90,6 +95,7 @@ lv_obj_t * ui_Label36;
 void ui_event_Button3(lv_event_t * e);
 lv_obj_t * ui_Button3;
 lv_obj_t * ui_Label37;
+lv_obj_t * ui_lblSaved;
 void ui_event_ParamKeyboard(lv_event_t * e);
 lv_obj_t * ui_ParamKeyboard;
 lv_obj_t * ui_Settings;
@@ -107,6 +113,7 @@ void ui_event_Switch2(lv_event_t * e);
 lv_obj_t * ui_Switch2;
 lv_obj_t * ui_ContBackLigth;
 lv_obj_t * ui_lblBackLight;
+void ui_event_switchManualAutomatic(lv_event_t * e);
 lv_obj_t * ui_switchManualAutomatic;
 lv_obj_t * ui_Label6;
 lv_obj_t * ui_lblLigthSensorValue;
@@ -133,6 +140,9 @@ lv_obj_t * ui_lblBuildDateValue;
 lv_obj_t * ui_ConBuildVersion;
 lv_obj_t * ui_lblBuildVersion;
 lv_obj_t * ui_lblBuildVersionValue;
+void ui_event_btnFWUpdate(lv_event_t * e);
+lv_obj_t * ui_btnFWUpdate;
+lv_obj_t * ui_Label38;
 lv_obj_t * ui_ConRunTime;
 lv_obj_t * ui_lblRunTime;
 lv_obj_t * ui_lblRunTimeValue;
@@ -142,6 +152,12 @@ lv_obj_t * ui_lblGitHub;
 lv_obj_t * ui_ConAuth;
 lv_obj_t * ui_lblGit1;
 lv_obj_t * ui_lblGitHub1;
+lv_obj_t * ui_ConPayPall;
+lv_obj_t * ui_lblGit2;
+void ui_event_Button8(lv_event_t * e);
+lv_obj_t * ui_Button8;
+lv_obj_t * ui_lblPaypall;
+lv_obj_t * ui_Image1;
 
 
 // SCREEN: ui_Wifi_Settings
@@ -268,6 +284,7 @@ lv_obj_t * ui_lblBack2;
 void ui_event_KeyboardMQTT(lv_event_t * e);
 lv_obj_t * ui_KeyboardMQTT;
 lv_obj_t * ui____initial_actions0;
+const lv_image_dsc_t * ui_imgset_qrcode_[1] = {&ui_img_qrcode_2_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -406,6 +423,14 @@ void ui_event_Switch2(lv_event_t * e)
         _ui_switch_theme(UI_THEME_DEFAULT);
     }
 }
+void ui_event_switchManualAutomatic(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        funcBackLightButton(e);
+    }
+}
 void ui_event_LigthSensorSlider(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -428,6 +453,26 @@ void ui_event_btnReset(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         funcSWReset(e);
+    }
+}
+void ui_event_btnFWUpdate(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        funcCheckFW(e);
+    }
+}
+void ui_event_Button8(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_flag_modify(ui_ConBuildDate, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_TOGGLE);
+        _ui_flag_modify(ui_ConBuildVersion, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_TOGGLE);
+        _ui_flag_modify(ui_ConRunTime, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_TOGGLE);
+        _ui_flag_modify(ui_ConGitHub, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_TOGGLE);
+        _ui_flag_modify(ui_ConAuth, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_TOGGLE);
     }
 }
 void ui_event_btnScanWifi(lv_event_t * e)

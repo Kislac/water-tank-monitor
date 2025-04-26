@@ -286,7 +286,7 @@ void funcForgetMQTTSettings(lv_event_t * e)
 	// Clear EEPROM
 	EEPROM.begin(512); // Initialize EEPROM with a size of 512 bytes
 	EEPROM.put(0, MQTT_Configured); // Save the configuration flag as false
-	for (int i = 1; i < 512; i++) {
+	for (int i = 1; i < 300; i++) {
 		EEPROM.write(i, 0); // Clear all other EEPROM data
 	}
 	EEPROM.commit(); // Commit changes to EEPROM
@@ -408,14 +408,23 @@ void funcParamKeyboardOk(lv_event_t * e)
 void funcParamSave(lv_event_t * e)
 {
 	// Read values from UI
-	uint8_t global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
-	uint16_t global_rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
-	uint16_t global_rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
-	uint16_t global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
-	uint16_t global_cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
-	uint16_t global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
-	uint16_t global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
-	uint16_t global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+	//uint8_t  global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	//uint16_t global_rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
+	//uint16_t global_rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
+	//uint16_t global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
+	//uint16_t global_cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
+	//uint16_t global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
+	//uint16_t global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
+	//uint16_t global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+
+	global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	global_rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
+	global_rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
+	global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
+	global_cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
+	global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
+	global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
+	global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
 
 	// Save to EEPROM (compatible with MQTT layout: tank params after MQTT block)
 	// MQTT block: 0-192 (see: 0=flag, 1-64=server, 65-128=user, 129-192=pass)
@@ -434,32 +443,72 @@ void funcParamSave(lv_event_t * e)
 	EEPROM.end();
 
 	Serial.println("Tank parameters saved to EEPROM.");
+	CalcMaxTanklevel();
+
+	lv_obj_clear_flag(ui_lblSaved, LV_OBJ_FLAG_HIDDEN);
+	lv_anim_t a;
+	lv_anim_init(&a);
+	lv_anim_set_var(&a, ui_lblSaved);
+	lv_anim_set_values(&a, LV_OPA_COVER, LV_OPA_TRANSP);
+	lv_anim_set_time(&a, 5000);
+	lv_anim_set_exec_cb(&a, [](void * obj, int32_t v) {
+		lv_obj_set_style_opa((lv_obj_t *)obj, v, 0);
+	});
+	lv_anim_set_ready_cb(&a, [](lv_anim_t * a) {
+		lv_obj_add_flag((lv_obj_t *)a->var, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_set_style_opa((lv_obj_t *)a->var, LV_OPA_COVER, 0);
+	});
+	lv_anim_start(&a);
+	
+	// Calculate global_MaxTankLevelInLiter in liters (dm^3)
+//  float radius;
+//  float height;
+//  float width;
+//  float depth;
+//  //float height;
+//  if (global_tankType == 0) { // Cilinder
+//    // Volume = π * r^2 * h
+//    radius = global_cilDiameter / 200.0f; // Convert mm to dm
+//    height = global_cilHeight / 100.0f; // Convert mm to dm
+//    global_MaxTankLevelInLiter = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
+//  } else if (global_tankType == 1) { // Rectangle
+//    // Volume = width * depth * height
+//    width = global_rectWide / 100.0f; // Convert mm to dm
+//    depth = global_rectDepth / 100.0f; // Convert mm to dm
+//    height = global_rectHeight / 100.0f; // Convert mm to dm
+//    global_MaxTankLevelInLiter = width * depth * height; // Volume in liters (dm^3)
+//  }
+//  
+//	char text_buffer[32];
+//	// Update the UI label with the calculated maximum tank level
+//	sprintf(text_buffer, "%u L", global_MaxTankLevelInLiter);
+//	lv_label_set_text(ui_lblMaxValue, text_buffer);
+//	// Set the maximum value of ui_BarCurrentState to global_MaxTankLevelInLiter
+//	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevelInLiter);
+}
+
+
+void funcCheckFW(lv_event_t * e)
+{
+	checkForUpdate();
+}
+
+void funcBackLightButton(lv_event_t * e)
+{
 
 	
-	// Calculate global_MaxTankLevel in liters (dm^3)
-  float radius;
-  float height;
-  float width;
-  float depth;
-  //float height;
-  if (global_tankType == 0) { // Cilinder
-    // Volume = π * r^2 * h
-    radius = global_cilDiameter / 200.0f; // Convert mm to dm
-    height = global_cilHeight / 100.0f; // Convert mm to dm
-    global_MaxTankLevel = 3.14159265f * radius * radius * height; // Volume in liters (dm^3)
-  } else if (global_tankType == 1) { // Rectangle
-    // Volume = width * depth * height
-    width = global_rectWide / 100.0f; // Convert mm to dm
-    depth = global_rectDepth / 100.0f; // Convert mm to dm
-    height = global_rectHeight / 100.0f; // Convert mm to dm
-    global_MaxTankLevel = width * depth * height; // Volume in liters (dm^3)
-  }
-  
-	char text_buffer[32];
-	// Update the UI label with the calculated maximum tank level
-	sprintf(text_buffer, "%u L", global_MaxTankLevel);
-	lv_label_set_text(ui_lblMaxValue, text_buffer);
-	// Set the maximum value of ui_BarCurrentState to global_MaxTankLevel
-	lv_bar_set_range(ui_BarCurrentState, 0, (int)global_MaxTankLevel);
+	// Save the state of ui_switchManualAutomatic to EEPROM
+	// Manual mode: !(lv_obj_get_state(ui_switchManualAutomatic) & LV_STATE_CHECKED)
+	// Automatic mode: (lv_obj_get_state(ui_switchManualAutomatic) & LV_STATE_CHECKED)
+	bool isAutomatic = (lv_obj_get_state(ui_switchManualAutomatic) & LV_STATE_CHECKED);
+	int lightSensorValue = lv_slider_get_value(ui_LigthSensorSlider); // Get slider value (0-100)
+	EEPROM.begin(512); // Ensure EEPROM is initialized with the same size as elsewhere
+	EEPROM.write(300, isAutomatic ? 1 : 0); // Store at address 300: 1=automatic, 0=manual
+	EEPROM.write(301, lightSensorValue); // Store slider value at address 301
+	EEPROM.commit();
+	EEPROM.end();
+	Serial.printf("Manual/Automatic switch state saved: %s\n", isAutomatic ? "Automatic" : "Manual");
+	Serial.printf("Light sensor slider value saved: %d\n", lightSensorValue);
 }
+
 

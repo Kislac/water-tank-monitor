@@ -12,6 +12,7 @@ SET(SOURCES screens/ui_Main_Screen.c
     images/ui_img_wifiinternetok_png.c
     images/ui_img_wifidisconnected_png.c
     images/ui_img_wificonnectednointernet_png.c
+    images/ui_img_qrcode_2_png.c
     fonts/ui_font_DejaVuSansMono14.c
     fonts/ui_font_MontserratRegular14ExtASCI.c
     fonts/ui_font_MontserratRegular14ExtASCIBold.c
