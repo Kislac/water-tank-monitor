@@ -161,7 +161,7 @@ Update this part to this:
 ---
 
 
-### SquareLine Studio Settings
+## SquareLine Studio Settings
 
 - **New Project:**
   - Major LVGL version: 9.1
@@ -232,7 +232,7 @@ VL53L1X & AHT10
 |<img src="Docs/ReadmePics/MiniSpeaker.webp" alt="TOF400C-VL53L1" width="100" height="100" />|MiniSpeaker <br>(8R 1W)<br> (Optionally)|1|1 eur|400 huf|[AliExpress](https://www.aliexpress.com/item/1005006116555207.html?spm=a2g0o.productlist.main.12.28a54mbg4mbgBk&algo_pvid=211da820-1a80-4dd3-8641-405bd4ab72c2&algo_exp_id=211da820-1a80-4dd3-8641-405bd4ab72c2-11&pdp_ext_f=%7B"order"%3A"178"%2C"eval"%3A"1"%7D&pdp_npi=4%40dis%21HUF%21921.25%21792.09%21%21%2118.26%2115.70%21%4021038e6617456773259747782e78fa%2112000035824265950%21sea%21HU%21165456939%21X&curPageLogUid=WIlYI5tJOtuN&utparam-url=scene%3Asearch%7Cquery_from%3A)|[Tavir](https://shop.tavir.hu/termek/modulok/hangkeltes-mp3-erosito/mini-hangszoro-8r-1w/)|
 |<img src="Docs/ReadmePics/TOF400C-VL53L1.png" alt="TOF400C-VL53L1" width="100" height="100" />|TOF400C-VL53L1|1 pcs|5 eur|2000 huf| [AliExpress](https://www.aliexpress.com/item/1005006160743016.html?spm=a2g0o.order_list.order_list_main.10.6d311802U5VZOT)| [Hestore](https://www.hestore.hu/prod_10041187.html?gad_source=1&gclid=Cj0KCQjwiLLABhCEARIsAJYS6unt5quxkfF2_4SqqQaWyOaD3Lwgzoylcigu6t7i1H6qDEFLWvrN-CMaAqVfEALw_wcB)|
 |<img src="Docs/ReadmePics/AHT10.webp" alt="TOF400C-VL53L1" width="100" height="100" />|AHT10|1 pcs|2.5 eur|1000 huf|[AliExpress](https://www.aliexpress.com/item/1005005023375532.html?src=google&albch=search&acnt=479-062-3723&isdl=y&aff_short_key=UneMJZVf&albcp=266121556&albag=7593673036&slnk=&trgt=dsa-42862830006&plac=&crea=426823514858&albad=426823514858&netw=g&device=c&mtctp=&memo1=&albbt=Google_7_search&aff_platform=google&albagn=888888&isSmbActive=false&isSmbAutoCall=false&needSmbHouyi=false&gad_source=1&gclid=Cj0KCQjwiLLABhCEARIsAJYS6umhiqMehTujN-VKJJJNx4mUn3w9dylqnrinE9NRaQ_YExPbri5FiFYaAleQEALw_wcB)|[Tavir](https://shop.tavir.hu/termek/modulok/homerseklet/aht10-ho-paraszenzor/)|
-|<img src="Docs/ReadmePics/PWR-USB-C-PH2-WH.webp" alt="PWR-USB-C-PH2-WH" height="100" />|PWR-USB-C-PH2-WH|1pcs|? eur|? huf|-|[[Hestore](https://www.hestore.hu/prod_10047569.html)]|
+|<img src="Docs/ReadmePics/PWR-USB-C-PH2-WH.webp" alt="PWR-USB-C-PH2-WH" height="100" />|PWR-USB-C-PH2-WH|1pcs|? eur|? huf|-|[Hestore](https://www.hestore.hu/prod_10047569.html)|
 |<img src="Docs/ReadmePics/DS1126-S80B.webp" alt="DS1126-S80B" height="100" />|DS1126-S80B <br>(or similiar)|2pcs|1 Eur|400 Huf|-|[Hestore](https://www.hestore.hu/prod_10041015.html)|
 |<img src="Docs/ReadmePics/CAT7SFTP.webp" alt="PWR-USB-C-PH2-WH" height="100" />|S/FTP|1pcs|14 Eur|5500 Huf|-|[Alza](https://www.alza.hu/alzapower-patch-cat7-s-ftp-30m-sedy?dq=12481409)|
 |<img src="Docs/ReadmePics/JT-A1250H-4P-300.webp" alt="JT-A1250H-4P-300" height="100" />|JT-A1250H-4P-300|2pcs|1 eur|500 Huf|-|[Hestore](https://www.hestore.hu/prod_10047751.html)|

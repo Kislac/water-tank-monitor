@@ -6641,7 +6641,6 @@
                       },
                       {
                         "nid": 1946543451,
-                        "flags": 1048576,
                         "strtype": "OBJECT/Flags",
                         "InheritedType": 1
                       },
@@ -6839,7 +6838,6 @@
                       },
                       {
                         "nid": -241917811,
-                        "flags": 1048576,
                         "strtype": "CHART/Chart",
                         "InheritedType": 1
                       },
@@ -6860,7 +6858,7 @@
                         "strtype": "CHART/Division_lines",
                         "intarray": [
                           5,
-                          5
+                          7
                         ],
                         "InheritedType": 7
                       },
@@ -6882,7 +6880,7 @@
                         "nid": 1884644046,
                         "strtype": "CHART/XMajor",
                         "intarray": [
-                          5,
+                          3,
                           13
                         ],
                         "InheritedType": 7
@@ -7950,8 +7948,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "TABPAGE",
-                "tree_closed": true
+                "saved_objtypeKey": "TABPAGE"
               },
               {
                 "guid": "GUID41855455-1103076S1495497",
@@ -67888,7 +67885,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "D:\\GIT\\water-tank-monitor\\src\\ui",
     "projectExportFolderPath": "D:\\GIT\\water-tank-monitor",
-    "backup_cnt": 707,
+    "backup_cnt": 728,
     "autosave_cnt": 0,
     "lvgl_version": "9.1.0",
     "callfuncsexport": "CPP_FILE",

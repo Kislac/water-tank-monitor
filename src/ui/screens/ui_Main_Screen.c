@@ -381,7 +381,7 @@ void ui_Main_Screen_screen_init(void)
     lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_ChartActualLiter, 30);
     lv_chart_set_range(ui_ChartActualLiter, LV_CHART_AXIS_PRIMARY_Y, 0, 3200);
-    lv_chart_set_div_line_count(ui_ChartActualLiter, 5, 5);
+    lv_chart_set_div_line_count(ui_ChartActualLiter, 5, 7);
 
     ui_ChartActualLiter_Xaxis = lv_scale_create(ui_ChartActualLiter);
     lv_scale_set_mode(ui_ChartActualLiter_Xaxis, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
@@ -393,7 +393,7 @@ void ui_Main_Screen_screen_init(void)
     lv_obj_set_style_line_width(ui_ChartActualLiter_Xaxis, 1, LV_PART_ITEMS);   //LVGL-9.1 ticks are thicker by default
     lv_obj_set_style_line_width(ui_ChartActualLiter_Xaxis, 1, LV_PART_INDICATOR);
     lv_obj_set_style_length(ui_ChartActualLiter_Xaxis, 1, LV_PART_ITEMS);      //minor tick length
-    lv_obj_set_style_length(ui_ChartActualLiter_Xaxis, 5, LV_PART_INDICATOR);      //major tick length
+    lv_obj_set_style_length(ui_ChartActualLiter_Xaxis, 3, LV_PART_INDICATOR);      //major tick length
     lv_scale_set_range(ui_ChartActualLiter_Xaxis, 0, 13 > 0 ? 13 - 1 : 0);
     lv_scale_set_total_tick_count(ui_ChartActualLiter_Xaxis, (13 > 0 ? 13 - 1 : 0) * 0 + 1);
     lv_scale_set_major_tick_every(ui_ChartActualLiter_Xaxis, 0 >= 1 ? 0 : 1);

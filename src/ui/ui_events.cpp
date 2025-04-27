@@ -490,7 +490,7 @@ void funcParamSave(lv_event_t * e)
 
 void funcCheckFW(lv_event_t * e)
 {
-	checkForUpdate();
+	//checkForUpdate();
 }
 
 void funcBackLightButton(lv_event_t * e)

@@ -123,7 +123,7 @@ void initializeBuildInfo()
 
   // Update the ui_VerValue with the code version
   device_sw_version[16];
-  sprintf(device_sw_version, "v1.0.%d", build_number);
+  sprintf(device_sw_version, "v1.1.%d", build_number);
   lv_label_set_text(ui_lblBuildVersionValue, device_sw_version);
 }
 
@@ -768,35 +768,36 @@ void ReadTankLevelinLiters() {
 void UpdateChartActualLiter() {
   static ulong lastChartUpdate = 0;
   static lv_chart_series_t *distance_series = nullptr;
-  static lv_coord_t liter_values[30] = {0}; // Store last 30 values
+  int NumberOfPoints = 360; // Number of points in the chart
+  static lv_coord_t liter_values[360] = {0}; // Store last 30 values
   static bool initialized = false;
 
   // Initialize the array with LV_CHART_POINT_NONE only once
   if (!initialized) {
-    for (int i = 0; i < 30; ++i) {
+    for (int i = 0; i < NumberOfPoints; ++i) {
       liter_values[i] = LV_CHART_POINT_NONE;
     }
     initialized = true;
   }
 
   ulong now_ms = millis();
-  if (now_ms - lastChartUpdate >= 10000) { // 10 sec
+  if (now_ms - lastChartUpdate >= 60000) { // 60 sec
     lastChartUpdate = now_ms;
 
 
     // Shift values left
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < NumberOfPoints-1; i++) {
       liter_values[i] = liter_values[i + 1];
     }
     // Add current liter value
-    liter_values[29] = CurrentLiter;
+    liter_values[NumberOfPoints-1] = CurrentLiter;
 
     // Setup chart series if not done
     if (!distance_series) {
       distance_series = lv_chart_add_series(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
     }
 
-    lv_chart_set_point_count(ui_ChartActualLiter, 30);
+    lv_chart_set_point_count(ui_ChartActualLiter, NumberOfPoints);
     lv_chart_set_ext_y_array(ui_ChartActualLiter, distance_series, liter_values);
 
     lv_chart_refresh(ui_ChartActualLiter);
@@ -867,25 +868,6 @@ void DistanceSensorRead() {
         //lv_label_set_text(ui_lblCurrentLiter, text_buffer);
 
 
-        //
-        //lv_label_set_text(ui_lblDistanceStatus, text_buffer);
-
-//        static int last8Distances[8] = {0}; // Array to store the last 8 distance values
-//        // Shift the values to the left
-//        for (int i = 0; i < 7; i++) {
-//            last8Distances[i] = last8Distances[i + 1];
-//        }
-//        // Add the new distance value to the end
-//        last8Distances[7] = distance;
-//
-//        // Format the last 8 distances into the text buffer
-//        snprintf(text_buffer, sizeof(text_buffer), 
-//            "%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm\n%d mm",
-//            last8Distances[0], last8Distances[1], last8Distances[2], last8Distances[3],
-//            last8Distances[4], last8Distances[5], last8Distances[6], last8Distances[7]);
-//
-//        //lv_label_set_text(ui_lblLast8Distance, text_buffer);
-
 
         static lv_coord_t distance_values[30] = {0}; // Array to store the last 50 distance values
 
@@ -897,57 +879,6 @@ void DistanceSensorRead() {
         // Add the new distance value to the end
         distance_values[29] = distance;
 
-        // Update the chart with the new values
-        
-//        lv_chart_set_point_count(ui_ChartActualDistance, 30); // Ensure the chart has 50 points
-//        static lv_chart_series_t *ui_ChartActualDistance_series = nullptr;
-//        if (ui_ChartActualDistance_series == nullptr) {
-//            ui_ChartActualDistance_series = lv_chart_add_series(ui_ChartActualDistance, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
-//        }
-//        //static lv_chart_series_t * ui_ChartActualDistance_series = nullptr;
-//        //ui_ChartActualDistance_series = lv_chart_add_series(ui_ChartActualDistance, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
-//        //if (status != "range valid") {
-//        //  ui_ChartActualDistance_series = lv_chart_add_series(ui_ChartActualDistance, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
-//        //} else {
-//        //  ui_ChartActualDistance_series = lv_chart_add_series(ui_ChartActualDistance, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
-//        //}
-//
-//        lv_chart_set_ext_y_array(ui_ChartActualDistance, ui_ChartActualDistance_series, distance_values);
-//        // Dynamically adjust the Y-axis range based on the maximum value in distance_values
-//        lv_coord_t max_value = 100; // Minimum maximum value
-//        for (int i = 0; i < 30; i++) {
-//            if (distance_values[i] > max_value) {
-//          max_value = distance_values[i];
-//            }
-//        }
-//        max_value = min(max_value, 4500); // Cap the maximum value at 4500
-//        lv_chart_set_range(ui_ChartActualDistance, LV_CHART_AXIS_PRIMARY_Y, 0, max_value);
-//        lv_scale_set_range(ui_ChartActualDistance_Yaxis1,  0, max_value);
-//        lv_chart_refresh(ui_ChartActualDistance); // Refresh the chart to display the updated values
-
-        // Update the ui_BarCurrentState with the current distance value
-        //lv_bar_set_value(ui_BarCurrentState, distance, LV_ANIM_ON);
-      
-//      else {
-//        Serial.println("Out of range");
-//        lv_chart_set_point_count(ui_ChartActualDistance, 50); // Ensure the chart has 50 points
-//        static lv_chart_series_t * ui_ErrorChart_series = lv_chart_add_series(ui_ChartActualDistance, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
-//        static lv_coord_t error_values[50] = {0}; // Array to store the last 50 error values
-//
-//        // Shift the values to the left
-//        for (int i = 0; i < 49; i++) {
-//            error_values[i] = error_values[i + 1];
-//        }
-//        // Add a 0 value to the end for invalid measurement
-//        error_values[49] = 0;
-//
-//        // Update the chart with the new error values
-//        lv_chart_set_ext_y_array(ui_ChartActualDistance, ui_ErrorChart_series, error_values);
-//        lv_chart_refresh(ui_ChartActualDistance); // Refresh the chart to display the updated values
-//      }
-      
-      //static int minDistance = INT_MAX; // Initialize to maximum possible value
-      //static int maxDistance = INT_MIN; // Initialize to minimum possible value
 
       // Update min and max distances
       if (global_minDistance == 0 || distance < global_minDistance) {
@@ -1143,103 +1074,58 @@ void ReadTankParamsFromEEPROM() {
 void setupChart() {
 
 
-  // Create a cursor for the chart
-  static lv_chart_cursor_t *cursor = nullptr;
-  if (!cursor) {
-    cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
-  }
-
-  // Add event handler to show value on click/touch
-  lv_obj_add_event_cb(ui_ChartActualLiter, [](lv_event_t *e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    if (code == LV_EVENT_CLICKED) {
-      lv_obj_t *chart = (lv_obj_t *)lv_event_get_target(e);
-      int32_t id = lv_chart_get_pressed_point(chart);
-      if (id == LV_CHART_POINT_NONE) return;
-
-      // Move the cursor to the selected point
-      lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
-      if (ser) {
-        lv_chart_set_cursor_point(chart, cursor, ser, id);
-
-        int32_t *y_array = lv_chart_get_y_array(chart, ser);
-        int32_t value = y_array[id];
-
-        // Show value in a label (or use LVGL message box/toast as needed)
-        static char buf[32];
-        snprintf(buf, sizeof(buf), "Érték: %d L", value);
-        lv_label_set_text(ui_lblCurrentLiter1, buf);
-      }
-    }
-  }, LV_EVENT_CLICKED, nullptr);
-
-
-
-  // Hozz létre egy kurzort a charton
+//  // Create a cursor for the chart
 //  static lv_chart_cursor_t *cursor = nullptr;
 //  if (!cursor) {
-//      cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
+//    cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
 //  }
 //
-//  // Állítsd be az eseménykezelőt a chartra
+//  // Add event handler to show value on click/touch
 //  lv_obj_add_event_cb(ui_ChartActualLiter, [](lv_event_t *e) {
-//      lv_event_code_t code = lv_event_get_code(e);
+//    lv_event_code_t code = lv_event_get_code(e);
+//    if (code == LV_EVENT_CLICKED) {
 //      lv_obj_t *chart = (lv_obj_t *)lv_event_get_target(e);
+//      int32_t id = lv_chart_get_pressed_point(chart);
+//      if (id == LV_CHART_POINT_NONE) return;
 //
-//      if (code == LV_EVENT_CLICKED) {
-//          int32_t id = lv_chart_get_pressed_point(chart);
-//          if (id == LV_CHART_POINT_NONE) return;
+//      // Move the cursor to the selected point
+//      lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
+//      if (ser) {
+//        lv_chart_set_cursor_point(chart, cursor, ser, id);
 //
-//          LV_LOG_USER("Selected point %d", (int)id);
+//        int32_t *y_array = lv_chart_get_y_array(chart, ser);
+//        int32_t value = y_array[id];
 //
-//          lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
-//          while (ser) {
-//              lv_point_t p;
-//              lv_chart_get_point_pos_by_id(chart, ser, id, &p);
-//
-//              int32_t *y_array = lv_chart_get_y_array(chart, ser);
-//              int32_t value = y_array[id];
-//
-//              char buf[16];
-//              lv_snprintf(buf, sizeof(buf), "%d", value);
-//
-//              lv_draw_rect_dsc_t draw_rect_dsc;
-//              lv_draw_rect_dsc_init(&draw_rect_dsc);
-//              draw_rect_dsc.bg_color = lv_color_black();
-//              draw_rect_dsc.bg_opa = LV_OPA_50;
-//              draw_rect_dsc.radius = 3;
-//              draw_rect_dsc.bg_image_src = buf;
-//              draw_rect_dsc.bg_image_recolor = lv_color_white();
-//
-//              lv_area_t chart_obj_coords;
-//              lv_obj_get_coords(chart, &chart_obj_coords);
-//              lv_area_t a;
-//              a.x1 = chart_obj_coords.x1 + p.x - 20;
-//              a.x2 = chart_obj_coords.x1 + p.x + 20;
-//              a.y1 = chart_obj_coords.y1 + p.y - 30;
-//              a.y2 = chart_obj_coords.y1 + p.y - 10;
-//
-//              lv_layer_t *layer = lv_event_get_layer(e);
-//              lv_draw_rect(layer, &draw_rect_dsc, &a);
-//
-//              ser = lv_chart_get_series_next(chart, ser);
-//          }
+//        // Show value in a label (or use LVGL message box/toast as needed)
+//        static char buf[32];
+//        snprintf(buf, sizeof(buf), "Érték: %d L", value);
+//        lv_label_set_text(ui_lblCurrentLiter1, buf);
 //      }
-//  }, LV_EVENT_ALL, nullptr);
+//    }
+//  }, LV_EVENT_CLICKED, nullptr);
 
-//  /* Az X-tengely feliratainak létrehozása */
-//  static const char *x_labels[] = {"12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0", NULL};
-//
-//  /* Hozz létre egy skálát az X-tengelyhez az alsó oldalra */
-//  lv_obj_t *scale_bottom = lv_scale_create(lv_obj_get_parent(ui_ChartActualLiter)); // A grafikon szülőjéhez add hozzá
-//  lv_scale_set_mode(scale_bottom, LV_SCALE_MODE_HORIZONTAL_BOTTOM); // Ez az alsó oldalra helyezi
-//  lv_obj_set_size(scale_bottom, lv_obj_get_width(ui_ChartActualLiter)-15, 25); // Szélesség: a grafikon szélessége, magasság: 25 pixel
-//  lv_obj_align_to(scale_bottom, ui_ChartActualLiter, LV_ALIGN_OUT_BOTTOM_MID, 0, 1); // Igazítás a grafikon alá, 1 pixel távolsággal
-//
-//  /* Állítsd be a feliratokat az X-tengelyhez */
-//  lv_scale_set_text_src(scale_bottom, x_labels);
-//  //lv_scale_set_total_tick_count(scale_bottom, 13, 0); // 13 tick line (0-tól 12-ig)
-//  lv_obj_set_width(scale_bottom, lv_obj_get_width(ui_ChartActualLiter));
+
+
+
+lv_obj_t * scale = lv_scale_create(lv_obj_get_parent(ui_ChartActualLiter));
+lv_obj_set_size(scale, lv_pct(80), 100);
+lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+lv_obj_center(scale);
+lv_obj_set_size(scale, lv_obj_get_width(ui_ChartActualLiter)-18, 25); // Szélesség: a grafikon szélessége, magasság: 25 pixel
+lv_obj_align_to(scale, ui_ChartActualLiter, LV_ALIGN_OUT_BOTTOM_MID, 0, 0); // Igazítás a grafikon alá, 1 pixel távolsággal
+lv_scale_set_label_show(scale, true);
+
+lv_scale_set_total_tick_count(scale, 7);
+lv_scale_set_major_tick_every(scale, 1);
+
+lv_obj_set_style_length(scale, 1, LV_PART_ITEMS);
+lv_obj_set_style_length(scale, 3, LV_PART_INDICATOR);
+lv_scale_set_range(scale, 6, 0);
+
+
+
+
+
 
 // Állítsd be, hogy a grafikonon ne jelenjenek meg pontok, csak a vonal legyen látható
 //lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE); // Csak vonal
@@ -1429,32 +1315,16 @@ void setup() {
   ReadTankParamsFromEEPROM();
   //CalcMaxTanklevel();
 
-  setupChart(); // Kurzor beállítása a charton
+  setupChart();
 
   //checkForUpdate();  // Ellenőrzés induláskor
 
-  //if (psramFound()) {
-  //    Serial.println("PSRAM is available!");
-  //    Serial.printf("Total PSRAM: %d bytes\n", ESP.getPsramSize());
-  //    Serial.printf("Free PSRAM: %d bytes\n", ESP.getFreePsram());
-  //} else {
-  //    Serial.println("PSRAM is NOT available.");
-  //}
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
-    //static ulong lastHeapPrint = 0;
-//    if (now - lastHeapPrint >= 2000) {
-//      lastHeapPrint = now;
-//      printHeapStatus();
-//      lv_mem_monitor_t mem_mon;
-//      lv_mem_monitor(&mem_mon);
-//      printf("Total: %d bytes, Free: %d bytes, Largest Free: %d bytes\n",
-//        (int)mem_mon.total_size, (int)mem_mon.free_size, (int)mem_mon.free_biggest_size);
-//    }
 
     runtimecalc();
     AutoBacklight();
