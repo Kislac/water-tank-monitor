@@ -12,6 +12,8 @@ extern "C" {
 
 void funcResetMinMaxDistance(lv_event_t * e);
 void funcTankTypeChanged(lv_event_t * e);
+void funcTankTypeChangedCilinder(lv_event_t * e);
+void funcTankTypeChangedRectangle(lv_event_t * e);
 void funcParamRectangleWide(lv_event_t * e);
 void funcParamRectangleDepth(lv_event_t * e);
 void funcParamRectangleHeight(lv_event_t * e);
@@ -19,18 +21,29 @@ void funcParamCilinderDiameter(lv_event_t * e);
 void funcParamCilinderHeight(lv_event_t * e);
 void funcParamEmptyTank(lv_event_t * e);
 void funcParamFullTank(lv_event_t * e);
+void funcMainScreenInfoButton(lv_event_t * e);
 void funcParamSave(lv_event_t * e);
 void funcParamKeyboardOk(lv_event_t * e);
+void funcWifiButton(lv_event_t * e);
+void funcMQTTButtonPress(lv_event_t * e);
 void funcBackLightButton(lv_event_t * e);
 void funcRotateScreen(lv_event_t * e);
 void funcSWReset(lv_event_t * e);
 void funcCheckFW(lv_event_t * e);
+void funcWifiSettings_ScanWifiButton(lv_event_t * e);
 void funcResetWifi(lv_event_t * e);
+void funcWifiSettingsBack(lv_event_t * e);
 void funcWifiScan(lv_event_t * e);
+void funcWifiScanResult_BackButton(lv_event_t * e);
 void funcConnectToWifiButtonPress(lv_event_t * e);
+void funcConnectToWifi_ConnectionSuccessButton(lv_event_t * e);
 void funcRetryButtonWrongPassword(lv_event_t * e);
+void funcMQTTBackButtonPress(lv_event_t * e);
 void funcSaveMQTTCredentials(lv_event_t * e);
 void funcForgetMQTTSettings(lv_event_t * e);
+void funcInfoScreenBackButton(lv_event_t * e);
+void funcInfoNext(lv_event_t * e);
+void funcInfoBack(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

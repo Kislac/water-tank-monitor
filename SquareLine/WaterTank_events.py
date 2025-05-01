@@ -94,3 +94,59 @@ def funcCheckFW(event_struct):
 def funcBackLightButton(event_struct):
     return
 
+
+def funcInfoNext(event_struct):
+    return
+
+
+def funcInfoBack(event_struct):
+    return
+
+
+def funcTankTypeChangedCilinder(event_struct):
+    return
+
+
+def funcTankTypeChangedRectangle(event_struct):
+    return
+
+
+def funcInfoScreenBackButton(event_struct):
+    return
+
+
+def funcMainScreenInfoButton(event_struct):
+    return
+
+
+def funcMQTTButtonPress(event_struct):
+    return
+
+
+def funcMQTTBackButtonPress(event_struct):
+    return
+
+
+def funcWifiButton(event_struct):
+    return
+
+
+def funcWifiSettingsBack(event_struct):
+    return
+
+
+def funcWifiSettings_ScanWifiButton(event_struct):
+    return
+
+
+def funcWifiScanResult_BackButton(event_struct):
+    return
+
+
+def funcConnectToWifi_ConnectionSuccessfullButton(event_struct):
+    return
+
+
+def funcConnectToWifi_ConnectionSuccessButton(event_struct):
+    return
+

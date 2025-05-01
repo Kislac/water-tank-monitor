@@ -9,6 +9,7 @@ void ui_Wifi_Settings_screen_init(void)
 {
     ui_Wifi_Settings = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_Wifi_Settings, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_Wifi_Settings, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_Wifi_Settings);
     ui_object_set_themeable_style_property(ui_Wifi_Settings, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
                                            _ui_theme_color_BackGround);
     ui_object_set_themeable_style_property(ui_Wifi_Settings, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,

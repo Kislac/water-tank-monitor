@@ -96,6 +96,9 @@ int distance = 0;
 int CurrentLiter;
 float CurrentLiterInPer;
 
+// Inicializáld a globális változót
+//lv_obj_t * global_ui_Info = NULL;
+
 void initializeBuildInfo()
 {
   
@@ -208,42 +211,53 @@ void RefreshWifiParameters() {
   if (millis() - last_refresh_time >= 5000) { // Refresh every 5 seconds
     last_refresh_time = millis();
 
-    // Refresh WiFi status
-    const char *status = (WiFi.status() == WL_CONNECTED) ? "Connected" : "Disconnected";
-    lv_label_set_text(ui_lblWifiStatus, status);
+    if(lv_scr_act() == ui_Wifi_Settings){
+      // Refresh WiFi status
+      const char *status = (WiFi.status() == WL_CONNECTED) ? "Connected" : "Disconnected";
+      lv_label_set_text(ui_lblWifiStatus, status);
 
 
-    if (WiFi.status() == WL_CONNECTED) {
-      // Refresh SSID
-      lv_label_set_text(ui_lblWifiSSID, WiFi.SSID().c_str());
-      
+      if (WiFi.status() == WL_CONNECTED) {
+        // Refresh SSID
+        lv_label_set_text(ui_lblWifiSSID, WiFi.SSID().c_str());
+        
 
-      // Refresh IP address
-      lv_label_set_text(ui_lblWifiIP, WiFi.localIP().toString().c_str());
+        // Refresh IP address
+        lv_label_set_text(ui_lblWifiIP, WiFi.localIP().toString().c_str());
 
-      // Refresh RSSI
-      char rssi_text[16];
-      snprintf(rssi_text, sizeof(rssi_text), "%d dBm", WiFi.RSSI());
-      lv_label_set_text(ui_lblWifiRSSI, rssi_text);
-      lv_label_set_text(ui_lblWifiRSSI2, rssi_text);
+        // Refresh RSSI
+        char rssi_text[16];
+        snprintf(rssi_text, sizeof(rssi_text), "%d dBm", WiFi.RSSI());
+        lv_label_set_text(ui_lblWifiRSSI, rssi_text);
+        //lv_label_set_text(ui_lblWifiRSSI2, rssi_text);
 
-      // Refresh Channel
-      char channel_text[16];
-      snprintf(channel_text, sizeof(channel_text), "Ch: %d", WiFi.channel());
-      lv_label_set_text(ui_lblWifiChannel, channel_text);
+        // Refresh Channel
+        char channel_text[16];
+        snprintf(channel_text, sizeof(channel_text), "Ch: %d", WiFi.channel());
+        lv_label_set_text(ui_lblWifiChannel, channel_text);
 
-      lv_label_set_text(ui_lblWifiSecurity, security.c_str());
+        lv_label_set_text(ui_lblWifiSecurity, security.c_str());
 
-      
-      
-        } else {
-      // Clear labels if not connected
-      lv_label_set_text(ui_lblWifiSSID, "N/A");
-      lv_label_set_text(ui_lblWifiRSSI2, "N/A");
-      lv_label_set_text(ui_lblWifiIP, "N/A");
-      lv_label_set_text(ui_lblWifiRSSI, "N/A");
-      lv_label_set_text(ui_lblWifiChannel, "N/A");
-      lv_label_set_text(ui_lblWifiSecurity, "N/A");
+        
+        
+      } else {
+        // Clear labels if not connected
+        lv_label_set_text(ui_lblWifiSSID, "N/A");
+        lv_label_set_text(ui_lblWifiRSSI2, "N/A");
+        lv_label_set_text(ui_lblWifiIP, "N/A");
+        lv_label_set_text(ui_lblWifiRSSI, "N/A");
+        lv_label_set_text(ui_lblWifiChannel, "N/A");
+        lv_label_set_text(ui_lblWifiSecurity, "N/A");
+      }
+    }else if(lv_scr_act() == ui_Main_Screen){
+      if (WiFi.status() == WL_CONNECTED) {
+        // Refresh RSSI
+        char rssi_text[16];
+        snprintf(rssi_text, sizeof(rssi_text), "%d dBm", WiFi.RSSI());
+        lv_label_set_text(ui_lblWifiRSSI2, rssi_text);
+      }else{
+        lv_label_set_text(ui_lblWifiRSSI2, "- dBm");
+      }
     }
   }
 }
@@ -300,11 +314,11 @@ if (millis() - last_time_update >= 1000) { // Update time every second
   if (timeinfo) {
     char datetime_text[32];
     strftime(datetime_text, sizeof(datetime_text), "%Y.%m.%d %H:%M:%S", timeinfo);
-    lv_label_set_text(ui_lblTime, datetime_text);
+    //lv_label_set_text(ui_lblTime, datetime_text);
     lv_label_set_text(ui_lblDataNTime, datetime_text);
 
   } else {
-    lv_label_set_text(ui_lblTime, "Time Unavailable");
+    //lv_label_set_text(ui_lblTime, "Time Unavailable");
     lv_label_set_text(ui_lblDataNTime, "Time Unavailable");
   }
 }
@@ -591,9 +605,9 @@ void ReadMQTTSettingsFromEEPROM(){
     strncpy(global_mqtt_user, mqttUser, sizeof(global_mqtt_user) - 1);
     strncpy(global_mqtt_password, mqttPassword, sizeof(global_mqtt_password) - 1);
 
-    lv_textarea_set_text(ui_TextAreaMQTTServer, global_mqtt_server);
-    lv_textarea_set_text(ui_TextAreaMQTTuser, global_mqtt_user);
-    lv_textarea_set_text(ui_TextAreaMQTTPassword, global_mqtt_password);
+    //lv_textarea_set_text(ui_TextAreaMQTTServer, global_mqtt_server);
+    //lv_textarea_set_text(ui_TextAreaMQTTuser, global_mqtt_user);
+    //lv_textarea_set_text(ui_TextAreaMQTTPassword, global_mqtt_password);
 
     Serial.println("MQTT credentials loaded successfully from EEPROM.");
     Serial.printf("Server: %s, User: %s, Pass: %s\n", global_mqtt_server, global_mqtt_user, global_mqtt_password);
@@ -770,6 +784,8 @@ void UpdateChartActualLiter() {
   static lv_chart_series_t *distance_series = nullptr;
   int NumberOfPoints = 360; // Number of points in the chart
   static lv_coord_t liter_values[360] = {0}; // Store last 30 values
+  //int NumberOfPoints = 12; // Number of points in the chart
+  //static lv_coord_t liter_values[12] = {0}; // Store last 30 values
   static bool initialized = false;
 
   // Initialize the array with LV_CHART_POINT_NONE only once
@@ -781,7 +797,7 @@ void UpdateChartActualLiter() {
   }
 
   ulong now_ms = millis();
-  if (now_ms - lastChartUpdate >= 60000) { // 60 sec
+  if (now_ms - lastChartUpdate >= 5000) { // 60 sec
     lastChartUpdate = now_ms;
 
 
@@ -801,6 +817,7 @@ void UpdateChartActualLiter() {
     lv_chart_set_ext_y_array(ui_ChartActualLiter, distance_series, liter_values);
 
     lv_chart_refresh(ui_ChartActualLiter);
+    Serial.println("Chart refreshed.");
   }
 }
 
@@ -838,6 +855,7 @@ void UpdateChartActualLiterRightToLeft() {
     lv_chart_set_ext_y_array(ui_ChartActualLiter, distance_series, liter_values);
 
     lv_chart_refresh(ui_ChartActualLiter);
+    Serial.println("Chart refreshed.");
   }
 }
 
@@ -856,7 +874,7 @@ void DistanceSensorRead() {
       distance = sensor.ranging_data.range_mm; // Corrected missing semicolon
       std::string status = VL53L1X::rangeStatusToString(sensor.ranging_data.range_status); // Use std::string
       sprintf(text_buffer, "%s", status.c_str()); // Convert std::string to C-string
-      Serial.printf("Distance: %d mm, Status: %s\n", distance, status.c_str());
+      //Serial.printf("Distance: %d mm, Status: %s\n", distance, status.c_str());
       if (status != "range valid" || distance <= 1 || distance > 4000) {
         Serial.println("Distance out of range or invalid status. Ignoring measurement.");
         //distance = 0;
@@ -986,6 +1004,7 @@ void CalcMaxTanklevel() {
   // Update the chart Y-axis range max to global_MaxTankLevelInLiter
   //lv_scale_set_range(ui_ChartActualDistance_Yaxis1,  0, max_value);
   lv_chart_refresh(ui_ChartActualLiter); // Refresh the chart to display the updated values
+  Serial.println("Chart refreshed.");
 
 
 //        lv_chart_set_range(ui_ChartActualDistance, LV_CHART_AXIS_PRIMARY_Y, 0, max_value);
@@ -1065,47 +1084,101 @@ void ReadTankParamsFromEEPROM() {
   Serial.printf("Full Tank: %u\n", global_fullTank);
 
   // Call funcTankTypeChanged to update UI containers
-  funcTankTypeChanged(nullptr);
+  //funcTankTypeChanged(nullptr);
+  if(global_tankType == 0) {
+    funcTankTypeChangedCilinder(nullptr);
+  } else if(global_tankType == 1) {
+    funcTankTypeChangedRectangle(nullptr);
+  } else {
+    Serial.println("Invalid tank type loaded from EEPROM.");
+  }
   CalcMaxTanklevel();
 
 }
 
 
+char GrapValueBuf[32] = "";            // aktuális érték
+char LastGrapValueBuf[32] = "";        // utoljára kiírt érték
+int labelboxposx = 0;            // labelbox pozíciója
+int labelboxposy = 0;            // labelbox pozíciója
+
+
+void chart_event_cb(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * chart = lv_event_get_target_obj(e);
+
+  static bool chart_clicked = false;
+  static int LV_EVENT_DRAW_POST_END_Number = 0;
+
+  if (code == LV_EVENT_CLICKED) {
+    chart_clicked = true;
+    Serial.println("Chart clicked, chart_clicked set to true.");
+  }
+
+  if(code == LV_EVENT_VALUE_CHANGED) {
+    Serial.printf("[%lu] LV_EVENT_VALUE_CHANGED triggered\n", millis());
+    lv_obj_invalidate(chart);
+  }
+  if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    Serial.printf("[%lu] LV_EVENT_REFR_EXT_DRAW_SIZE triggered\n", millis());
+    int32_t * s = (int32_t *)lv_event_get_param(e);
+    *s = LV_MAX(*s, 20);
+  }
+  //else if(code == LV_EVENT_DRAW_POST_END) {
+  else if (code == LV_EVENT_DRAW_POST_END && chart_clicked) {
+    LV_EVENT_DRAW_POST_END_Number++;
+    if(LV_EVENT_DRAW_POST_END_Number > 30) {
+      chart_clicked = false;
+      LV_EVENT_DRAW_POST_END_Number = 0;
+    }
+    Serial.printf("[%lu] LV_EVENT_DRAW_POST_END triggered\n", millis());
+    //Serial.printf("[%lu] Chart clicked event detected.", millis());
+    uint32_t id = lv_chart_get_pressed_point(chart);
+    Serial.printf("[%lu] Pressed point id: %d\n", millis(), id);
+    if(id == LV_CHART_POINT_NONE) return;
+
+    lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
+    Serial.printf("ser: %p\n", (void*)ser);
+    while(ser) {
+      lv_point_t p;
+      lv_chart_get_point_pos_by_id(chart, ser, id, &p);
+
+      int32_t * y_array = lv_chart_get_y_array(chart, ser);
+
+      Serial.print("y_array: ");
+      for (int i = 0; i < lv_chart_get_point_count(chart); ++i) {
+        Serial.printf("%d ", y_array[i]);
+      }
+      Serial.println();
+
+      
+      int32_t value = y_array[id];
+      lv_snprintf(GrapValueBuf, sizeof(GrapValueBuf), "%d L", value);
+      Serial.printf("[%lu] Drawing value: %s at point (%d, %d)\n", millis(), GrapValueBuf, p.x, p.y);
+
+      
+          labelboxposx = p.x - lv_obj_get_width(ui_PanelGraphValue) / 2;
+          labelboxposy = p.y - lv_obj_get_height(ui_PanelGraphValue) - 10; // kicsit fölé
+
+          // Y pozíció korlátozása -30 és 80 közé
+          if (labelboxposy < -30) labelboxposy = -30;
+          if (labelboxposy > 80)  labelboxposy = 80;
+
+
+
+      ser = lv_chart_get_series_next(chart, ser);
+    }
+  }
+  else if(code == LV_EVENT_RELEASED) {
+    Serial.println("LV_EVENT_RELEASED triggered");
+    lv_obj_add_flag(ui_PanelGraphValue, LV_OBJ_FLAG_HIDDEN);  // panel elrejtése
+    lv_obj_invalidate(chart);
+    chart_clicked = false;
+  }
+}
+
 void setupChart() {
-
-
-//  // Create a cursor for the chart
-//  static lv_chart_cursor_t *cursor = nullptr;
-//  if (!cursor) {
-//    cursor = lv_chart_add_cursor(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_RED), LV_DIR_BOTTOM);
-//  }
-//
-//  // Add event handler to show value on click/touch
-//  lv_obj_add_event_cb(ui_ChartActualLiter, [](lv_event_t *e) {
-//    lv_event_code_t code = lv_event_get_code(e);
-//    if (code == LV_EVENT_CLICKED) {
-//      lv_obj_t *chart = (lv_obj_t *)lv_event_get_target(e);
-//      int32_t id = lv_chart_get_pressed_point(chart);
-//      if (id == LV_CHART_POINT_NONE) return;
-//
-//      // Move the cursor to the selected point
-//      lv_chart_series_t *ser = lv_chart_get_series_next(chart, NULL);
-//      if (ser) {
-//        lv_chart_set_cursor_point(chart, cursor, ser, id);
-//
-//        int32_t *y_array = lv_chart_get_y_array(chart, ser);
-//        int32_t value = y_array[id];
-//
-//        // Show value in a label (or use LVGL message box/toast as needed)
-//        static char buf[32];
-//        snprintf(buf, sizeof(buf), "Érték: %d L", value);
-//        lv_label_set_text(ui_lblCurrentLiter1, buf);
-//      }
-//    }
-//  }, LV_EVENT_CLICKED, nullptr);
-
-
-
 
 lv_obj_t * scale = lv_scale_create(lv_obj_get_parent(ui_ChartActualLiter));
 lv_obj_set_size(scale, lv_pct(80), 100);
@@ -1124,38 +1197,32 @@ lv_scale_set_range(scale, 6, 0);
 
 
 
-
-
-
-// Állítsd be, hogy a grafikonon ne jelenjenek meg pontok, csak a vonal legyen látható
-//lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE); // Csak vonal
-//lv_obj_set_style_size(ui_ChartActualLiter, 0, 0, LV_PART_INDICATOR); // Pontméret 0, így nem látszanak a pontok
-
+lv_obj_set_style_bg_opa(ui_PanelGraphValue, LV_OPA_60, 0);
+lv_obj_set_style_border_width(ui_PanelGraphValue, 0, 0);
 // Állítsd be a grafikon típusát
 lv_chart_set_type(ui_ChartActualLiter, LV_CHART_TYPE_LINE); // Csak vonal
 lv_obj_set_style_size(ui_ChartActualLiter, 0, 0, LV_PART_INDICATOR); // Pontméret 0, így nem látszanak a pontok
 
-//  // Fade-elés beállítása
-//  lv_obj_set_style_opa(ui_ChartActualLiter, LV_OPA_COVER, LV_PART_MAIN);
-//  lv_obj_set_style_line_opa(ui_ChartActualLiter, LV_OPA_80, LV_PART_ITEMS);
-//  lv_obj_set_style_line_width(ui_ChartActualLiter, 3, LV_PART_ITEMS);
-//  lv_obj_set_style_line_color(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_BLUE), LV_PART_ITEMS);
-//  lv_obj_set_style_bg_opa(ui_ChartActualLiter, LV_OPA_20, LV_PART_INDICATOR);
-//  lv_obj_set_style_bg_color(ui_ChartActualLiter, lv_palette_lighten(LV_PALETTE_BLUE, 3), LV_PART_INDICATOR);
-//  
-//  // Enable area under the line (faded effect)
-//  lv_obj_set_style_bg_opa(ui_ChartActualLiter, LV_OPA_40, LV_PART_ITEMS);
-//  lv_obj_set_style_bg_color(ui_ChartActualLiter, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_ITEMS);
-//  
-//  // Egyedi osztóvonalak
-//  lv_chart_set_div_line_count(ui_ChartActualLiter, 5, 6); // 5 vízszintes, 6 függőleges
-//  lv_obj_set_style_line_color(ui_ChartActualLiter, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-//  lv_obj_set_style_line_opa(ui_ChartActualLiter, LV_OPA_40, LV_PART_MAIN);
-//  lv_obj_set_style_line_width(ui_ChartActualLiter, 1, LV_PART_MAIN);
 
-// Frissítsd a grafikont
-lv_chart_refresh(ui_ChartActualLiter);
+Serial.println("setupChart() called.");
+
+    if (!ui_ChartActualLiter) {
+        Serial.println("Error: ui_ChartActualLiter is not initialized.");
+        return;
+    }
+    Serial.println("ui_ChartActualLiter is initialized.");
+
+    lv_obj_add_flag(ui_ChartActualLiter, LV_OBJ_FLAG_CLICKABLE); // Engedélyezi a kattintást
+
+    // Register the event callback for the chart
+    lv_obj_add_event_cb(ui_ChartActualLiter, chart_event_cb, LV_EVENT_ALL, NULL);
+
+
+    // Refresh the chart
+    lv_chart_refresh(ui_ChartActualLiter);
+    Serial.println("Chart refreshed.");
 }
+
 
 void freeLVGLMemory() {
   Serial.println("Freeing LVGL memory...");
@@ -1247,6 +1314,22 @@ void ReadBacklightSettingsFromEEPROM() {
 }
 
 
+void check_and_update_graph_value() {
+  if (strcmp(GrapValueBuf, LastGrapValueBuf) != 0 && lv_tabview_get_tab_act(ui_MainTabView) == 0) {
+    Serial.printf("[DEBUG] Graph value changed: %s -> %s\n", LastGrapValueBuf, GrapValueBuf);
+    lv_label_set_text(ui_GraphValue, GrapValueBuf);
+    strcpy(LastGrapValueBuf, GrapValueBuf);
+
+    lv_obj_set_pos(ui_PanelGraphValue, labelboxposx, labelboxposy); // panel pozicionálása a megnyomott pont fölé
+    Serial.printf("[DEBUG] Panel position set to: x=%d, y=%d\n", labelboxposx, labelboxposy);
+    //lv_obj_set_style_bg_color(ui_PanelGraphValue, lv_palette_main(LV_PALETTE_GREY), 0); // panel színének beállítása
+     // Panel megjelenítése
+    lv_obj_clear_flag(ui_PanelGraphValue, LV_OBJ_FLAG_HIDDEN);
+    Serial.println("[DEBUG] Panel shown.");
+  }
+}
+
+
 void setup() {
   Serial.begin(115200);
 
@@ -1316,11 +1399,13 @@ void setup() {
   //CalcMaxTanklevel();
 
   setupChart();
-
+  
   //checkForUpdate();  // Ellenőrzés induláskor
 
 
 }
+
+
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -1331,7 +1416,7 @@ void loop() {
     RefreshWifiParameters();
     DateAndTimeHandling();
     CheckWifiandInternetStatus();
-
+    check_and_update_graph_value();
     aht10_initialized ? ReadAHT10() : ReinitializeAHT10();
     vl53l1x_initialized ? DistanceSensorRead() : ReinitializeVL53L1X();
 
@@ -1346,5 +1431,10 @@ void loop() {
       // Update the UI
       lv_timer_handler();
     }
+
+
+
+
+
 }
 

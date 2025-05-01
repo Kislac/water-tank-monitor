@@ -9,6 +9,7 @@ void ui_MQTTSettings_screen_init(void)
 {
     ui_MQTTSettings = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_MQTTSettings, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_MQTTSettings, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_MQTTSettings);
 
     ui_TopInfoBar = lv_obj_create(ui_MQTTSettings);
     lv_obj_remove_style_all(ui_TopInfoBar);

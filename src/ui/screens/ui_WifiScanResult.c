@@ -9,6 +9,7 @@ void ui_WifiScanResult_screen_init(void)
 {
     ui_WifiScanResult = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_WifiScanResult, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_WifiScanResult, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_WifiScanResult);
     lv_obj_set_style_pad_row(ui_WifiScanResult, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_WifiScanResult, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 

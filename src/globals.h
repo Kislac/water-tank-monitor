@@ -2,9 +2,11 @@
 #define GLOBALS_H
 
 #include <Arduino.h>
+#include <lvgl.h>
 
 void CalcMaxTanklevel();
 void checkForUpdate();
+void printHeapStatus();
 
 // Deklaráld a security változót extern-ként
 extern String security;
@@ -27,4 +29,12 @@ extern uint16_t global_emptyTank;
 extern uint16_t global_fullTank;
 extern float global_MaxTankLevelInLiter;
 extern float global_tankVolume;
+
+//extern lv_obj_t * global_ui_Info;
+
+
+
+
+
+
 #endif // GLOBALS_H

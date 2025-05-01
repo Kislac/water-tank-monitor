@@ -3,6 +3,7 @@ screens/ui_Wifi_Settings.c
 screens/ui_WifiScanResult.c
 screens/ui_ConnectToWifi.c
 screens/ui_MQTTSettings.c
+screens/ui_Info.c
 ui_theme_manager.cpp
 ui_themes.cpp
 ui.c

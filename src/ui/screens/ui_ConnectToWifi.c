@@ -9,6 +9,7 @@ void ui_ConnectToWifi_screen_init(void)
 {
     ui_ConnectToWifi = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_ConnectToWifi, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_ConnectToWifi, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_ConnectToWifi);
 
     ui_TopInfoBar3 = lv_obj_create(ui_ConnectToWifi);
     lv_obj_remove_style_all(ui_TopInfoBar3);

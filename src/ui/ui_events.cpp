@@ -151,6 +151,9 @@ void funcWifiScan(lv_event_t * e)
   
 		// Add an event callback to handle button clicks
 		lv_obj_add_event_cb(ui_Button_WifiSSID, [](lv_event_t *e) {
+
+		  ui_ConnectToWifi_screen_init(); // Initialize the ConnectToWifi screen
+
 		  Serial.print("-E1");
 		  //lv_obj_t *btn = lv_event_get_target(e);
 		  lv_obj_t *btn = (lv_obj_t *)lv_event_get_target(e); 
@@ -394,15 +397,32 @@ void funcParamKeyboardOk(lv_event_t * e)
 	lv_obj_clear_flag(ui_ContMinMax, LV_OBJ_FLAG_HIDDEN);
 	lv_obj_clear_flag(ui_ContButtons, LV_OBJ_FLAG_HIDDEN);
 
-	int selected_idx = lv_dropdown_get_selected(ui_DropdownParamTankType);
-	static char selected[32];
-	if (selected_idx == 0) {//Cilinder
+	//int selected_idx = lv_dropdown_get_selected(ui_DropdownParamTankType);
+	//static char selected[32];
+	//if (selected_idx == 0) {//Cilinder
+	//	lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	//	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	//} else if (selected_idx == 1) {//Rectangle
+	//	lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	//	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	//}
+	if(global_tankType == 0){ //cilinder
 		lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
 		lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
-	} else if (selected_idx == 1) {//Rectangle
+	} else if(global_tankType == 1){ //rectangle
 		lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
 		lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	} else {
+		Serial.println("Invalid tank type loaded from EEPROM.");
 	}
+
+
+
+	//global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank)) - atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+	//global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank)) - atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+
+	lv_textarea_set_text(ui_TextAreaRectangleHeight, String(atoi(lv_textarea_get_text(ui_TextAreaEmptyTank)) - atoi(lv_textarea_get_text(ui_TextAreaFullTank))).c_str());
+	lv_textarea_set_text(ui_TextAreaCilinderHeight, String(atoi(lv_textarea_get_text(ui_TextAreaEmptyTank)) - atoi(lv_textarea_get_text(ui_TextAreaFullTank))).c_str());
 }
 
 void funcParamSave(lv_event_t * e)
@@ -417,14 +437,24 @@ void funcParamSave(lv_event_t * e)
 	//uint16_t global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
 	//uint16_t global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
 
-	global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
+
+	global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
+	global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+	//global_tankType = lv_dropdown_get_selected(ui_DropdownParamTankType);
 	global_rectWide = atoi(lv_textarea_get_text(ui_TextAreaRectangleWide));
 	global_rectDepth = atoi(lv_textarea_get_text(ui_TextAreaRectangleDepth));
 	global_rectHeight = atoi(lv_textarea_get_text(ui_TextAreaRectangleHeight));
 	global_cilDiameter = atoi(lv_textarea_get_text(ui_TextAreaCilinderDiameter));
 	global_cilHeight = atoi(lv_textarea_get_text(ui_TextAreaCilinderHeight));
-	global_emptyTank = atoi(lv_textarea_get_text(ui_TextAreaEmptyTank));
-	global_fullTank = atoi(lv_textarea_get_text(ui_TextAreaFullTank));
+	
+	// Validate tank parameters: if not in 1-9999, set to 0
+	if (global_rectWide < 1 || global_rectWide > 9999) global_rectWide = 0;
+	if (global_rectDepth < 1 || global_rectDepth > 9999) global_rectDepth = 0;
+	if (global_rectHeight < 1 || global_rectHeight > 9999) global_rectHeight = 0;
+	if (global_cilDiameter < 1 || global_cilDiameter > 9999) global_cilDiameter = 0;
+	if (global_cilHeight < 1 || global_cilHeight > 9999) global_cilHeight = 0;
+	if (global_emptyTank < 1 || global_emptyTank > 9999) global_emptyTank = 0;
+	if (global_fullTank < 1 || global_fullTank > 9999) global_fullTank = 0;
 
 	// Save to EEPROM (compatible with MQTT layout: tank params after MQTT block)
 	// MQTT block: 0-192 (see: 0=flag, 1-64=server, 65-128=user, 129-192=pass)
@@ -490,7 +520,7 @@ void funcParamSave(lv_event_t * e)
 
 void funcCheckFW(lv_event_t * e)
 {
-	//checkForUpdate();
+	checkForUpdate();
 }
 
 void funcBackLightButton(lv_event_t * e)
@@ -512,3 +542,150 @@ void funcBackLightButton(lv_event_t * e)
 }
 
 
+
+
+void funcInfoNext(lv_event_t * e)
+{
+	// Your code here
+}
+
+void funcInfoBack(lv_event_t * e)
+{
+	// Your code here
+}
+
+
+void funcTankTypeChangedCilinder(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_set_style_bg_color(ui_btnCilinder, lv_color_hex(0x009000), LV_PART_MAIN);
+	lv_obj_set_style_bg_color(ui_BtnRectangle, lv_color_hex(0x0066ff), LV_PART_MAIN);
+	global_tankType = 0; // Set tank type to cilinder
+}
+
+void funcTankTypeChangedRectangle(lv_event_t * e)
+{
+	lv_obj_add_flag(ui_ContCilinder, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(ui_ContRectangle, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_set_style_bg_color(ui_BtnRectangle, lv_color_hex(0x009000), LV_PART_MAIN);
+	lv_obj_set_style_bg_color(ui_btnCilinder, lv_color_hex(0x0066ff), LV_PART_MAIN);
+	global_tankType = 1; // Set tank type to rectangle
+}
+//lv_obj_t * global_ui_Info = NULL;
+void funcMainScreenInfoButton(lv_event_t * e)
+{
+//	//ui_Info = lv_obj_create(NULL); // új screen létrehozása
+//    //// itt programból kell újra létrehozni a tartalmat is (ha nem exportáltad külön funkcióba)
+//    //create_Info_ui(ui_Info); // ez akkor működik, ha külön funkcióba exportáltad SquareLine-ból
+//	printHeapStatus(); // heap status kiírása a Serial Monitorra
+//	Serial.println("Info button pressed on Main screen.");
+//    lv_scr_load(ui_Info);
+//	printHeapStatus(); // heap status kiírása a Serial Monitorra
+
+	    // Létrehozza az ui_Info képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+		ui_Info_screen_init();
+
+		// Képernyő betöltése
+		lv_scr_load(ui_Info);
+	
+		// Tárolja a globális változóban, ha később szükséged van rá
+		//global_ui_Info = ui_Info;
+}
+
+void funcInfoScreenBackButton(lv_event_t * e)
+{
+//	printHeapStatus(); // heap status kiírása a Serial Monitorra
+//	Serial.println("Back button pressed on Info screen.");
+//	lv_scr_load(ui_Main_Screen);    // visszaváltás a főképernyőre
+//    //lv_obj_del(lv_event_get_target(e)); // opcionálisan törölheted is
+//	printHeapStatus(); // heap status kiírása a Serial Monitorra
+// Heap állapot kiírása
+    // Főképernyő betöltése
+    lv_scr_load(ui_Main_Screen);
+
+    // Az aktuális képernyő törlése
+    if (ui_Info) {
+        lv_obj_del(ui_Info); // Törli az `ui_Info` képernyőt
+        ui_Info = NULL; // Biztonság kedvéért nullázd ki
+    }
+}
+
+void funcMQTTButtonPress(lv_event_t * e)
+{
+	ui_MQTTSettings_screen_init(); // Létrehozza az ui_MQTTSettings képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+	lv_textarea_set_text(ui_TextAreaMQTTServer, global_mqtt_server);
+    lv_textarea_set_text(ui_TextAreaMQTTuser, global_mqtt_user);
+    lv_textarea_set_text(ui_TextAreaMQTTPassword, global_mqtt_password);
+	lv_scr_load(ui_MQTTSettings);
+
+}
+
+void funcMQTTBackButtonPress(lv_event_t * e)
+{
+	lv_scr_load(ui_Main_Screen);
+	// Az aktuális képernyő törlése
+    if (ui_MQTTSettings) {
+        lv_obj_del(ui_MQTTSettings); // Törli az `ui_Info` képernyőt
+        ui_MQTTSettings = NULL; // Biztonság kedvéért nullázd ki
+    }
+}
+
+void funcWifiButton(lv_event_t * e)
+{
+	// Létrehozza az ui_Info képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+	ui_Wifi_Settings_screen_init();
+
+	// Képernyő betöltése
+	lv_scr_load(ui_Wifi_Settings);
+}
+
+void funcWifiSettingsBack(lv_event_t * e)
+{
+	lv_scr_load(ui_Main_Screen);
+	// Az aktuális képernyő törlése
+	if (ui_Wifi_Settings) {
+		lv_obj_del(ui_Wifi_Settings); // Törli az `ui_Info` képernyőt
+		ui_Wifi_Settings = NULL; // Biztonság kedvéért nullázd ki
+	}
+}
+
+void funcWifiSettings_ScanWifiButton(lv_event_t * e)
+{
+	// Létrehozza az ui_Info képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+	ui_WifiScanResult_screen_init();
+
+	// Képernyő betöltése
+	lv_scr_load(ui_WifiScanResult);
+
+	if (ui_Wifi_Settings) {
+		lv_obj_del(ui_Wifi_Settings); // Törli az `ui_Info` képernyőt
+		ui_Wifi_Settings = NULL; // Biztonság kedvéért nullázd ki
+	}
+}
+
+void funcWifiScanResult_BackButton(lv_event_t * e)
+{
+	// Létrehozza az ui_Info képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+	ui_Wifi_Settings_screen_init();
+
+	// Képernyő betöltése
+	lv_scr_load(ui_Wifi_Settings);
+	if (ui_WifiScanResult) {
+		lv_obj_del(ui_WifiScanResult); // Törli az `ui_Info` képernyőt
+		ui_WifiScanResult = NULL; // Biztonság kedvéért nullázd ki
+	}
+}
+
+void funcConnectToWifi_ConnectionSuccessButton(lv_event_t * e)
+{
+	// Létrehozza az ui_Info képernyőt a SquareLine Studio által generált inicializáló függvénnyel
+	ui_Wifi_Settings_screen_init();
+
+	// Képernyő betöltése
+	lv_scr_load(ui_Wifi_Settings);
+	if (ui_ConnectToWifi) {
+		lv_obj_del(ui_ConnectToWifi); // Törli az `ui_Info` képernyőt
+		ui_ConnectToWifi = NULL; // Biztonság kedvéért nullázd ki
+	}
+}
