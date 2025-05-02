@@ -150,3 +150,11 @@ def funcConnectToWifi_ConnectionSuccessfullButton(event_struct):
 def funcConnectToWifi_ConnectionSuccessButton(event_struct):
     return
 
+
+def funcFWScreenBackButton(event_struct):
+    return
+
+
+def funcMoveToCheckFW(event_struct):
+    return
+

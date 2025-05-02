@@ -27,6 +27,7 @@ extern lv_obj_t * ui_imWifiDisconnected1;
 extern lv_obj_t * ui_imWifiConnectedNoInternet1;
 extern lv_obj_t * ui_lblDataNTime;
 extern lv_obj_t * ui_lblWifiRSSI2;
+extern lv_obj_t * ui_lblNewFw;
 extern lv_obj_t * ui_MainTabView;
 extern lv_obj_t * ui_Main;
 extern lv_obj_t * ui_PanelBar;

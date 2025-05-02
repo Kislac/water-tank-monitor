@@ -518,10 +518,7 @@ void funcParamSave(lv_event_t * e)
 }
 
 
-void funcCheckFW(lv_event_t * e)
-{
-	checkForUpdate();
-}
+
 
 void funcBackLightButton(lv_event_t * e)
 {
@@ -603,7 +600,7 @@ void funcInfoScreenBackButton(lv_event_t * e)
 // Heap állapot kiírása
     // Főképernyő betöltése
     lv_scr_load(ui_Main_Screen);
-
+	
     // Az aktuális képernyő törlése
     if (ui_Info) {
         lv_obj_del(ui_Info); // Törli az `ui_Info` képernyőt
@@ -688,4 +685,80 @@ void funcConnectToWifi_ConnectionSuccessButton(lv_event_t * e)
 		lv_obj_del(ui_ConnectToWifi); // Törli az `ui_Info` képernyőt
 		ui_ConnectToWifi = NULL; // Biztonság kedvéért nullázd ki
 	}
+}
+
+//void funcFWScreenBackButton(lv_event_t * e)
+//{
+//
+//	if (ui_Frimware) {
+//		lv_obj_del(ui_Frimware); // Törli az `ui_Info` képernyőt
+//		ui_Frimware = NULL; // Biztonság kedvéért nullázd ki
+//	}
+//	ui_Main_Screen_screen_init();
+//	lv_scr_load(ui_Main_Screen);
+//	FW_Update_Check = false; // Set the flag to check for firmware update
+//	
+//}
+
+
+void funcCheckFW(lv_event_t * e)
+{
+	//checkForUpdate();
+}
+
+void funcMoveToCheckFW(lv_event_t * e)
+{
+	FW_Update_Check = true; // Set the flag to check for firmware update
+
+	Serial.printf("ui_Main_Screen value before check: %p\n", ui_Main_Screen);
+	Serial.printf("Free heap before Screen Switch from Main: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+	//ui_Frimware_screen_init();
+	//lv_scr_load(ui_Frimware);
+	Serial.printf("ui_Main_Screen value after check: %p\n", ui_Main_Screen);
+	
+
+	delay(1000); // Wait for the screen to load before checking for updates
+	Serial.printf("Free heap after FW inited: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+
+
+	if (ui_Main_Screen != NULL) {
+		Serial.printf("Deleteing Main_Screen: %p\n", ui_Main_Screen);
+		lv_obj_del(ui_Main_Screen);
+		ui_Main_Screen = NULL; // Elkerülni a dupla törlést
+	}
+	//lv_obj_del(ui_Main_Screen); // Törli az `ui_Info` képernyőt
+	//ui_Main_Screen = NULL; // Biztonság kedvéért nullázd ki
+
+	delay(1000); // Wait for the screen to load before checking for updates
+	Serial.printf("Free heap after MainScreen deleted: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+
+
+	//EEPROM.begin(512); // Ensure EEPROM is initialized
+	//EEPROM.write(400, 1); // Store flag at address 400: 1 = FW checking in progress
+	//EEPROM.commit();
+	//EEPROM.end();
+	/*
+	LVGL-t teljesen "kikapcsolni" futás közben nem lehet, mivel a LVGL egy szoftveres grafikus könyvtár, amely a heapen foglal memóriát, és a képernyőkezelést végzi. Ha minden LVGL objektumot törölsz (lv_obj_del(lv_scr_act()) vagy minden képernyőt és objektumot), akkor jelentős memóriát szabadíthatsz fel, de a LVGL belső struktúrái (pl. display buffer, internal state) a memóriában maradnak.
+
+	Ha tényleg extrém memóriát akarsz felszabadítani, akkor:
+	- Minden képernyőt és objektumot törölj (lv_obj_del...).
+	- Ha a display drivert is leállítod (pl. lv_disp_remove), akkor a framebuffer is felszabadul.
+	- A LVGL könyvtár kódját futás közben nem lehet "unloadolni", csak újraindítással (esp_restart()) lehet teljesen felszabadítani.
+
+	Példa: minden objektum törlése és a display driver eltávolítása:
+	*/
+	// Törli az összes képernyőt (objektumot)
+	//lv_obj_clean(lv_scr_act());
+
+	// Ha van saját display drivered, azt is eltávolíthatod (opcionális, csak ha tényleg nincs többé szükség LVGL-re)
+	//lv_disp_t *disp = lv_disp_get_default();
+	//if (disp) {
+	//	lv_disp_remove(disp);
+	//}
+
+
+
+
+
+	// Ezzel a legtöbb LVGL által foglalt memóriát felszabadítod, de a könyvtár kódja és minimális állapota marad.
 }

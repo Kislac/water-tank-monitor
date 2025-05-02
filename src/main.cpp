@@ -75,6 +75,8 @@ char global_mqtt_server[64];
 char global_mqtt_user[64];
 char global_mqtt_password[64];
 
+bool FW_Update_Check = false;
+
 
 int global_minDistance = INT_MAX; // Initialize to maximum possible value
 int global_maxDistance = INT_MIN; // Initialize to minimum possible value
@@ -797,7 +799,7 @@ void UpdateChartActualLiter() {
   }
 
   ulong now_ms = millis();
-  if (now_ms - lastChartUpdate >= 5000) { // 60 sec
+  if (now_ms - lastChartUpdate >= 60000) { // 60 sec
     lastChartUpdate = now_ms;
 
 
@@ -1240,13 +1242,13 @@ void checkForUpdate() {
   Serial.println("Checking for firmware updates...");
   Serial.printf("Free heap before OTA: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 
-  // Optionally deinitialize LVGL to free memory
-  if (lvgl_enabled) {
-    Serial.println("Deinitializing LVGL to free memory...");
-    freeLVGLMemory();
-    //lvgl_enabled = false;
-    Serial.printf("Free heap after LVGL deinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
+//  // Optionally deinitialize LVGL to free memory
+//  if (lvgl_enabled) {
+//    Serial.println("Deinitializing LVGL to free memory...");
+//    freeLVGLMemory();
+//    //lvgl_enabled = false;
+//    Serial.printf("Free heap after LVGL deinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+//}
 
   const char* versionUrl = "https://raw.githubusercontent.com/Kislac/water-tank-monitor/main/data/version.txt";
 
@@ -1278,16 +1280,74 @@ void checkForUpdate() {
   }
 
   // Reinitialize LVGL after OTA/check
-  if (!lvgl_enabled) {
-    Serial.println("Reinitializing LVGL...");
-    smartdisplay_init();
-    ui_init();
-    lvgl_enabled = true;
-    Serial.printf("Free heap after LVGL reinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-  }
+  //if (!lvgl_enabled) {
+  //  Serial.println("Reinitializing LVGL...");
+  //  smartdisplay_init();
+  //  ui_init();
+  //  lvgl_enabled = true;
+  //  Serial.printf("Free heap after LVGL reinit: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+  //}
 
   Serial.println("--------------------------------");
   Serial.println("Firmware update check completed.");
+}
+
+
+// Függvény, amely lekérdezi a legfrissebb GitHub release verziót és összehasonlítja a build_number-rel
+bool isNewerFirmwareAvailable_GitHub(int &latest_build_number, String &latest_tag, String &download_url) {
+  const char* githubApiUrl = "https://api.github.com/repos/Kislac/water-tank-monitor/releases/latest";
+  WiFiClientSecure client;
+  client.setInsecure(); // Skip certificate validation
+
+  HTTPClient http;
+  latest_build_number = 0;
+  latest_tag = "";
+  download_url = "";
+
+  Serial.println("Checking latest release from GitHub API...");
+  if (http.begin(client, githubApiUrl)) {
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      // Parse JSON
+      StaticJsonDocument<2048> doc;
+      DeserializationError error = deserializeJson(doc, payload);
+      if (!error) {
+        // Get tag_name or name (e.g. "v1.1.508")
+        if (doc.containsKey("tag_name")) {
+          latest_tag = doc["tag_name"].as<String>();
+        } else if (doc.containsKey("name")) {
+          latest_tag = doc["name"].as<String>();
+        }
+        // Try to extract build number from tag (assume format v1.1.508)
+        int lastDot = latest_tag.lastIndexOf('.');
+        if (lastDot > 0) {
+          latest_build_number = latest_tag.substring(lastDot + 1).toInt();
+        }
+        // Find firmware.bin download URL
+        if (doc.containsKey("assets") && doc["assets"].is<JsonArray>()) {
+          for (JsonObject asset : doc["assets"].as<JsonArray>()) {
+            String name = asset["name"] | "";
+            if (name == "firmware.bin") {
+              download_url = asset["browser_download_url"].as<String>();
+              break;
+            }
+          }
+        }
+        Serial.printf("Latest tag: %s, build: %d, url: %s\n", latest_tag.c_str(), latest_build_number, download_url.c_str());
+        http.end();
+        return (latest_build_number > build_number);
+      } else {
+        Serial.println("JSON parse error.");
+      }
+    } else {
+      Serial.printf("HTTP error: %d\n", httpCode);
+    }
+    http.end();
+  } else {
+    Serial.println("HTTPS connection failed.");
+  }
+  return false;
 }
 
 
@@ -1330,8 +1390,51 @@ void check_and_update_graph_value() {
 }
 
 
+
+void checkFreeHeapMemory() {
+  static ulong lastHeapCheck = 0;
+  if (millis() - lastHeapCheck >= 2000) {
+    lastHeapCheck = millis();
+    Serial.printf("Free heap: %d bytes\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+  }
+}
+
+
 void setup() {
   Serial.begin(115200);
+
+  //wifi
+  WiFi.mode(WIFI_STA);
+  WiFi.begin();
+  WiFi.setSleep(true);  // Engedélyezd a WiFi energiatakarékos módját
+
+  // Wait until connected to WiFi (timeout 10 seconds)
+  Serial.print("Connecting to WiFi");
+  unsigned long wifi_start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - wifi_start < 10000) {
+    delay(100);
+    Serial.print(".");
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWiFi connected.");
+  } else {
+    Serial.println("\nWiFi connection timeout.");
+  }
+
+
+//  checkForUpdate();
+  // Check if newer firmware is available on GitHub
+  int latest_build_number = 0;
+  String latest_tag, download_url;
+  if (isNewerFirmwareAvailable_GitHub(latest_build_number, latest_tag, download_url)) {
+    Serial.printf("Newer firmware available: %s (build %d)\n", latest_tag.c_str(), latest_build_number);
+    Serial.printf("Download URL: %s\n", download_url.c_str());
+    // You can trigger OTA update here if desired
+  } else {
+    Serial.printf("Latest firmware on github: %s (build %d)\n", latest_tag.c_str(), latest_build_number);
+    Serial.printf("Download URL: %s\n", download_url.c_str());
+    Serial.println("No newer firmware available on GitHub.");
+  }
 
   // Initialize I2C bus for VL53L1X
   I2C_VL53L1X.begin(VL53L1X_SDA, VL53L1X_SCL);
@@ -1367,7 +1470,8 @@ void setup() {
   // lv_disp_set_rotation(disp, LV_DISP_ROT_270);
   Serial.println("Starting ui_init()...");
   ui_init();
-  
+  //ui_Main_Screen_screen_init();
+	//lv_scr_load(ui_Main_Screen);
 
   Serial.println("Starting the program...");
 
@@ -1384,10 +1488,6 @@ void setup() {
   ReadBacklightSettingsFromEEPROM();
 
 
-  //wifi
-  WiFi.mode(WIFI_STA);
-  WiFi.begin();
-  WiFi.setSleep(true);  // Engedélyezd a WiFi energiatakarékos módját
   // Init the Wifi Signal images. Important to init after ui_init()
   initWifiSignalImages();
   initVariables();
@@ -1411,6 +1511,9 @@ void loop() {
   // put your main code here, to run repeatedly:
     now = millis();
 
+    checkFreeHeapMemory();
+
+  if (FW_Update_Check == false && lv_scr_act() == ui_Main_Screen) {
     runtimecalc();
     AutoBacklight();
     RefreshWifiParameters();
@@ -1424,6 +1527,10 @@ void loop() {
       client.loop();
 
     publishMQTTSensoraDatas();
+  }  
+    
+
+
     if (lvgl_enabled) {
       // Update the ticker
       lv_tick_inc(now - lv_last_tick);

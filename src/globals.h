@@ -31,7 +31,7 @@ extern float global_MaxTankLevelInLiter;
 extern float global_tankVolume;
 
 //extern lv_obj_t * global_ui_Info;
-
+extern bool FW_Update_Check;
 
 
 
